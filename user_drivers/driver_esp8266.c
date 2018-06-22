@@ -244,7 +244,7 @@ bool ESP8266_Cmd ( char * cmd, char * reply1, char * reply2, uint32_t waittime )
 	macPC_Usart ( "%s", strEsp8266_Fram_Record .Data_RX_BUF );
   
 	if ( ( reply1 != 0 ) && ( reply2 != 0 ) )
-		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) || 
+		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) && 
 						 ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) ); 
  	
 	else if ( reply1 != 0 )
@@ -255,7 +255,36 @@ bool ESP8266_Cmd ( char * cmd, char * reply1, char * reply2, uint32_t waittime )
 	
 }
 
+void ESP8266_send(char * cmd )
+{
+	strEsp8266_Fram_Record .InfBit .FramLength = 0;               //从新开始接收新的数据包
 
+	macESP8266_Usart ( "%s\r\n", cmd );
+}
+
+char ESP8266_resp(char * reply1, char * reply2 ,uint32_t waittime)
+{
+	static int32_t timeCnt = 0;
+	bool result = false;
+	if ( ( reply1 != 0 ) && ( reply2 != 0 ) )
+		result = ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) && 
+						 ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) ); 
+		
+	else if ( reply1 != 0 )
+		result = ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) );
+	
+	else
+		result = ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) );
+	
+	if(result)
+		return 0;
+	
+	timeCnt++;
+	if(timeCnt > waittime)
+		return 2;
+	else
+		return 1;
+}
 /*
  * 函数名：ESP8266_AT_Test
  * 描述  ：对WF-ESP8266模块进行AT测试启动
@@ -297,16 +326,20 @@ void ESP8266_AT_Test ( void )
  */
 bool ESP8266_Net_Mode_Choose ( ENUM_Net_ModeTypeDef enumMode )
 {
+	char resp[20];
+	sprintf ( resp, "+CWMODE_CUR:%d", enumMode);
+	if(ESP8266_Cmd ( "AT+CWMODE_CUR?", "OK", resp, 1000 ))
+		return true;
 	switch ( enumMode )
 	{
 		case STA:
-			return ESP8266_Cmd ( "AT+CWMODE=1", "OK", "no change", 2500 ); 
+			return ESP8266_Cmd ( "AT+CWMODE_DEF=1", "OK", 0, 2500 ); 
 		
 	  case AP:
-		  return ESP8266_Cmd ( "AT+CWMODE=2", "OK", "no change", 2500 ); 
+		  return ESP8266_Cmd ( "AT+CWMODE_DEF=2", "OK", 0, 2500 ); 
 		
 		case STA_AP:
-		  return ESP8266_Cmd ( "AT+CWMODE=3", "OK", "no change", 2500 ); 
+		  return ESP8266_Cmd ( "AT+CWMODE_DEF=3", "OK", 0, 2500 ); 
 		
 	  default:
 		  return false;
@@ -314,6 +347,22 @@ bool ESP8266_Net_Mode_Choose ( ENUM_Net_ModeTypeDef enumMode )
 	
 }
 
+/*
+ * 函数名：ESP8266_Net_Mode_Choose
+ * 描述  ：选择WF-ESP8266模块的工作模式
+ * 输入  ：enumMode，工作模式
+ * 返回  : 1，选择成功
+ *         0，选择失败
+ * 调用  ：被外部调用
+ */
+bool ESP8266_Net_Auto_Connect (void)
+{
+	char resp[20];
+	sprintf ( resp, "+CWAUTOCONN:%d", 1);
+	if(ESP8266_Cmd ( "AT+CWAUTOCONN?", "OK", resp, 1000 ))
+		return true;
+	return ESP8266_Cmd ( "AT+CWAUTOCONN=1", "OK", 0, 1000 ); 
+}
 
 /*
  * 函数名：ESP8266_JoinAP
@@ -678,4 +727,13 @@ char * ESP8266_ReceiveString ( FunctionalState enumEnUnvarnishTx )
 
 	return pRecStr;
 	
+}
+
+bool ESP8266_SmartConfig(void)
+{
+	bool result = false;
+	if(ESP8266_Cmd ( "AT+CWSTARTSMART=3", "OK", "WIFI CONNECTED", 15000 ))
+		result = true;
+	ESP8266_Cmd ( "AT+CWSTOPSMART", "OK", 0, 1000 );
+	return result;	
 }

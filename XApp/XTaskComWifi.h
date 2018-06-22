@@ -20,10 +20,8 @@ public:
 	void ParseConf(U8 *command, U8 size);          // command routine for wifi module
 	void ResetFactory(void);                       // Reset Factory
 private:
-	U8 m_factory;                                  // factory reset flag(by dip)
-	U8 m_enable;                                   // enable to receive and transmit props
-	U8 m_startAp;                                  // start wifi module to ap mode
-	U8 m_factory2;                                 // factory2 reset flag(by cmd)
+	U8 m_linkState;                                   // enable to receive and transmit props
+	U8 m_smartConfig;                                  // start wifi module to ap mode
 };
 
 #ifdef __cplusplus

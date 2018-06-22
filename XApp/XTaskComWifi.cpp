@@ -3,16 +3,10 @@
 
 CXTaskComWifi::CXTaskComWifi(void)
 {
-	uart_init();
+	ESP8266_Init();
 
-	feature_mask |= MCU_LAN_SUPPORT;
-	feature_mask |= MCU_TIME_SUBSCRIPTION;         // sync utc time to host from ads because of schedule
-	feature_mask |= MCU_DATAPOINT_CONFIRM;
-	
-	m_enable  = 1;                                 // enable to serial polling between host and wifi module
-	m_factory = 0;                                 // factory reset flag(by dip)
-	m_startAp = 0;                                 // start ap mode flag
-	m_factory2 = 0;                                // factory reset flag2(by cmd)
+	m_smartConfig  = 0;                                 // enable to serial polling between host and wifi module
+	m_linkState = 0;                                 // factory reset flag(by dip)
 }
 
 CXTaskComWifi::~CXTaskComWifi(void)
@@ -21,30 +15,76 @@ CXTaskComWifi::~CXTaskComWifi(void)
 
 void CXTaskComWifi::InitTask(void)
 {
-	uart_init();
-
-	feature_mask |= MCU_LAN_SUPPORT;
-	feature_mask |= MCU_TIME_SUBSCRIPTION;         // sync utc time to host from ads because of schedule
-	feature_mask |= MCU_DATAPOINT_CONFIRM;
-
-	m_enable  = 1;                                 // enable to serial polling between host and wifi module
-	m_factory = 0;                                 // factory reset flag(by dip)
-	m_startAp = 0;                                 // start ap mode flag
-	m_factory2 = 0;                                // factory reset flag2(by cmd)
+	ESP8266_Init();
+	m_smartConfig  = 0;                                 // enable to serial polling between host and wifi module
+	m_linkState = 0;                                 // factory reset flag(by dip)
 }
 
 void CXTaskComWifi::DetectFactory(void)
 {
-	// check factoryreset firstly (SW1-1 is ON,SW1-2~SW1-6 are all OFF)
-	// detect factory reset in the first 5000ms after MCU boot(wifi module boot required 1800ms)
 	if(HOST_DAT_SW1_ON==(g_platform[PLATFORM_INDEX_SW_VAL]&0x3f))          // 1-0-0-0-0-0
 	{
-		m_factory = 1;                             // generate a factory reset flag
+		m_smartConfig = 1;                             // generate a factory reset flag
 	}
 }
 
+
+
+
 void CXTaskComWifi::DoReal(void)
 {
+	if(m_smartConfig)
+	{
+		switch(step)
+		{
+			case 0:
+				if(send == 0)
+					ESP8266_send ("AT+CWMODE_CUR?");
+			break;
+			case 1:
+				
+			break;
+			case 2:
+				
+			break;
+			case 3:
+				
+			break;
+			case 4:
+				
+			break;
+			case 5:
+				
+			break;
+		}
+		
+		switch(step)
+		{
+			case 0:
+				
+			break;
+			case 0:
+				
+			break;
+			case 0:
+				
+			break;
+			case 0:
+				
+			break;
+			case 0:
+				
+			break;
+			case 0:
+				
+			break;
+		}
+		
+	}
+	else
+	{
+		
+	}
 	struct prop *prop;
 	if (1 == WIFI_Ready())	                       // wifi ready pin is OK
 	{

@@ -3,3 +3,6 @@ MDK-ARM/RTE/*
 MDK-ARM/startup_stm32f103xb.lst
 MDK-ARM/wifi.uvguix.Administrator
 MDK-ARM/wifi/*
+*.bak
+MDK-ARM/JLinkLog.txt
+MDK-ARM/JLinkSettings.ini

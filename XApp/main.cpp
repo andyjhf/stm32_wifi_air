@@ -38,22 +38,38 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "stm32f1xx_hal.h"
 #include "driver_gpio.h"
 #include "driver_rcc.h"
 #include "driver_uart2.h"
 
-uint32_t led_blinkcnt = 0;
-uint32_t led_blinktime = 1000;
-static void LED_blink(uint16_t tmOnce)
-{
-	if(led_blinkcnt > led_blinktime)
-	{
-		LED_Toggle(LED1);
-		led_blinkcnt = 0;
-	}
-	led_blinkcnt++;
+osThreadId defaultTaskHandle;
 
+//uint32_t led_blinkcnt = 0;
+//uint32_t led_blinktime = 1000;
+//static void LED_blink(uint16_t tmOnce)
+//{
+//	if(led_blinkcnt > led_blinktime)
+//	{
+//		LED_Toggle(LED1);
+//		led_blinkcnt = 0;
+//	}
+//	led_blinkcnt++;
+
+//}
+
+void StartDefaultTask(void const * argument)
+{
+
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+		LED_Toggle(LED1);
+    osDelay(1000);
+  }
+  /* USER CODE END 5 */ 
 }
 
 /**
@@ -64,9 +80,9 @@ static void LED_blink(uint16_t tmOnce)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	static uint32_t curTick=0;                          // current tick time(ms)
-	static uint32_t taskTick[3]={0,0,0};              // job rotation tick time(ms)
-	static uint8_t  slot=0;                             // job rotation No
+//	static uint32_t curTick=0;                          // current tick time(ms)
+//	static uint32_t taskTick[3]={0,0,0};              // job rotation tick time(ms)
+//	static uint8_t  slot=0;                             // job rotation No
   /* USER CODE END 1 */
   HAL_Init();
   SystemClock_Config();
@@ -74,10 +90,14 @@ int main(void)
 	USART2_Init();
 	LED_Init(LED1);
 	printf("system init\r\n");
+	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	
+	osKernelStart();
   /* USER CODE BEGIN 2 */
   while (1)
   {
-		curTick=HAL_GetTick();                     // current tick time
+/*		curTick=HAL_GetTick();                     // current tick time
 		if(curTick != taskTick[slot])              // check current task's timetick
 		{
 			switch(slot)                           // which job No
@@ -96,7 +116,7 @@ int main(void)
 			taskTick[slot] = curTick;              // save job's tick time
 		}
 		slot++;                                    // next job
-		slot %= 3; 
+		slot %= 3; */
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */

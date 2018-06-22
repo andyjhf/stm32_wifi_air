@@ -9,13 +9,13 @@
 #include "MSerial.h"
 
 // weak functions
-__weak void USART6_OffReceive(void) {}                   // turn off receiver
-__weak void USART6_PreReceive(void) {}                   // prepare for receiving
-__weak void USART6_PreTransmit(void){}                   // prepare for transmitting
-__weak void USART6_StartSend(void)  {}                   // start to transmit
-__weak U8   USART6_GetByte(U8* pData)       { return 0;} // get a byte from USAR6T-buffer
-__weak U8   USART6_Write(U8* pData, U8 len) { return 0;} // write some bytes to USART6-buffer
-__weak U8   USART6_GetStatus(void)          { return 0;} // get usart6 state
+__weak void USART1_OffReceive(void) {}                   // turn off receiver
+__weak void USART1_PreReceive(void) {}                   // prepare for receiving
+__weak void USART1_PreTransmit(void){}                   // prepare for transmitting
+__weak void USART1_StartSend(void)  {}                   // start to transmit
+__weak U8   USART1_GetByte(U8* pData)       { return 0;} // get a byte from USAR6T-buffer
+__weak U8   USART1_Write(U8* pData, U8 len) { return 0;} // write some bytes to USART1-buffer
+__weak U8   USART1_GetStatus(void)          { return 0;} // get USART1 state
 
 CMSerial::CMSerial(void)
 {
@@ -72,14 +72,14 @@ void CMSerial::OnSend(void)
 		if(OnNewSend())                                // handle whether there is data to send or not
 		{
 			m_state = S_WAITING;                       // if need to send data this time then turn to [waiting] state
-			USART6_PreTransmit();                      // diable RXNEIE,enable TCIE and RS485-DE,clear buffer
-			USART6_Write(m_txBuf, m_txLen);            // copy send data to uart tx buffer
+			USART1_PreTransmit();                      // diable RXNEIE,enable TCIE and RS485-DE,clear buffer
+			USART1_Write(m_txBuf, m_txLen);            // copy send data to uart tx buffer
 		}
 //		else
 //		{
 //			m_state = S_RECEIVE;                       // if there is no data to send, turn to [receive] state
 //			m_rxLen = 0;                               // clear receiver buffer
-//			USART6_PreReceive();                       // set uart to rx state
+//			USART1_PreReceive();                       // set uart to rx state
 //		}
 	}
 }
@@ -89,23 +89,23 @@ void CMSerial::Waiting(void)
 	if(m_stateCnt>=m_tmWait)                       // waiting time is over
 	{
 		m_state = S_SENDING;                       // turn to [sending] state
-		USART6_StartSend();                        // starting to transmit
+		USART1_StartSend();                        // starting to transmit
 	}
 }
 
 void CMSerial::Sending(void)
 {
-	if(0==USART6_GetStatus())                      // send over
+	if(0==USART1_GetStatus())                      // send over
 	{
 		m_state = S_RECEIVE;                       // change to receive state
 		m_rxLen = 0;                               // clear receiver buffer
-		USART6_PreReceive();                       // set uart to rx state
+		USART1_PreReceive();                       // set uart to rx state
 	}
 }
 
 void CMSerial::Receiving(U16 tmOnce)
 {
-	while(USART6_GetByte(&m_rxBuf[m_rxLen]))       // get uart rx data to receiver buffer one by one
+	while(USART1_GetByte(&m_rxBuf[m_rxLen]))       // get uart rx data to receiver buffer one by one
 	{
 		m_rxLen++;                                 // receiver length plus one
 		m_idleCnt = 0;                             // clear idle counter
@@ -116,7 +116,7 @@ void CMSerial::Receiving(U16 tmOnce)
 	if((m_rxLen>0 && m_idleCnt>=m_tmRxOver) ||     // frame end, 
 		m_idleCnt>m_tmNoAck || m_rxLen>=255)       // timeout, out of buffer
 	{
-		USART6_OffReceive();                       // close uart rx function
+		USART1_OffReceive();                       // close uart rx function
 		m_state = S_ONRECV;                        // change to OnReceive state
 	}
 }
@@ -132,7 +132,7 @@ void CMSerial::OnReceive(void)
 //	{
 //		m_state = S_RECEIVE;                       // turn to receive state
 //		m_rxLen=0;                                 // clear receiver buffer
-//		USART6_PreReceive();                       // set uart to rx state
+//		USART1_PreReceive();                       // set uart to rx state
 //	}
 	OnNewRecv();
 	m_state = S_ONSEND;                        // turn to OnSend state

@@ -17,7 +17,7 @@
 
 /******************************* ESP8266 数据类型定义 ***************************/
 typedef enum{
-	STA,
+	STA = 1,
   AP,
   STA_AP  
 } ENUM_Net_ModeTypeDef;
