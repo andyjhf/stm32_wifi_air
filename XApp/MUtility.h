@@ -44,25 +44,24 @@ U8  MakeBcc(U8 *data, U8 size);                    // generate bcc
 U8  Hex2Asc(U8 *hex, U8 hexSize, U8 *szChar);      // encode BCD
 U8  Asc2Hex(U8 *szChar, U8 charSize, U8 *hex);     // decode BCD
 
-class CMQueue
+typedef struct
 {
-public:
-	CMQueue(U8 unit, U8 max);                      // TotalBytes=NodeSize*NodeNum
-	~CMQueue(void);
-	U8 Push(void* pNode);                          // add to tail
-	U8 Pop(void* pNode);                           // remove from head
-	void Clear(void);                              // clear all nodes
-	U8 GetNum(void);                               // get node number
-
-private:
-	U8 m_head;                                     // head node pos of FIFO list
+  U8 m_head;                                     // head node pos of FIFO list
 	U8 m_tail;                                     // tail node pos of FIFO list
 	U8 m_num;                                      // node number of FIFO list
 
 	U8  m_unit;                                    // the size of one node unit
 	U8  m_max;                                     // node number maximum
 	U8* m_buff;                                    // poiter of node list
-};
+}CMQueue;
+
+
+CMQueue* CMQueue_Init(U8 unit, U8 max);                      // TotalBytes=NodeSize*NodeNum
+U8 CMQueue_Push(CMQueue* queue,void* pNode);                          // add to tail
+U8 CMQueue_Pop(CMQueue* queue,void* pNode);                           // remove from head
+void CMQueue_Clear(CMQueue* queue);                              // clear all nodes
+U8 CMQueue_GetNum(CMQueue* queue);                               // get node number
+void CMQueue_Free(CMQueue* queue);
 
 #ifdef __cplusplus
 }

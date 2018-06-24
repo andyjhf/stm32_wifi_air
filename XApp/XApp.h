@@ -30,17 +30,10 @@ extern U8  g_szErvinfo[SZ_ERVINFO_SIZE+1];
 extern U8  g_szErvcommand[SZ_ERVCMD_SIZE+1];
 extern U8  g_szModulecommand[SZ_MODULECMD_SIZE+1];
 
-extern struct sched_prop g_timer[10];              // schedule array props
-
 // application
 void InitProp(void);                               // initilize props data
 void TransProp(void);                              // hex to string for props
 void ParseProp(U8 *command, U8 size);              // parse the WiFi-host command
-
-void set_sched(struct prop *prop, void *arg, void *valp, size_t len);
-
-void set_ervcommand(struct  prop *prop, void *arg, void *valp, size_t len);
-void set_modulecommand(struct prop *prop, void *arg, void *valp, size_t len);
 
 void XApp_Init(void);                              // initialize mcu application
 void XApp_Run(void);                               // run the mcu application 

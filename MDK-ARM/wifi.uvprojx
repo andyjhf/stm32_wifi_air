@@ -457,24 +457,34 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
-              <FileName>MSerial.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\XApp\MSerial.cpp</FilePath>
+              <FileName>MSerial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\MSerial.c</FilePath>
             </File>
             <File>
-              <FileName>MUtility.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\XApp\MUtility.cpp</FilePath>
+              <FileName>MUtility.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\MUtility.c</FilePath>
             </File>
             <File>
-              <FileName>XTaskComERV.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\XApp\XTaskComERV.cpp</FilePath>
+              <FileName>XTaskComERV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\XTaskComERV.c</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\XApp\main.cpp</FilePath>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>XTaskEsp8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\XTaskEsp8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>XApp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\XApp.c</FilePath>
             </File>
           </Files>
         </Group>

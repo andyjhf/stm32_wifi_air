@@ -39,17 +39,17 @@ void USART_printf ( UART_HandleTypeDef * USARTx, char * Data, ... )
 				case 'r':							          //»Ø³µ·û
 					USARTx->Instance->DR = 0x0d;
 //				USART_SendData(USARTx, 0x0d);
-				Data ++;
+					Data ++;
 				break;
 
 				case 'n':							          //»»ÐÐ·û
 					USARTx->Instance->DR = 0x0a;
 //				USART_SendData(USARTx, 0x0a);	
-				Data ++;
+					Data ++;
 				break;
 
 				default:
-				Data ++;
+					Data ++;
 				break;
 			}			 
 		}

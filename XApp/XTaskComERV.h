@@ -48,40 +48,14 @@ typedef struct tagXRemoteCmd{                   // struct of ERV control command
 	U8  data;                                   // erv data
 }XRemoteCmd;
 
-class CXTaskComERV: public CMSerial
-{
-public:
-	CXTaskComERV(void);
-	~CXTaskComERV(void);
 
-public:
-	void InitTask(void);
-	void ParseRemote(U8 *szRemote, U8 size);
-	void SetReg(U8 group,U16 addr, U16 value);
-#if DEBUG_LOG == 1
-	void debug(void);
-#endif
-	virtual U16 OnNewSend();
-	virtual U16 OnNewRecv();
+void CXTaskComERV_InitTask(void);
+void CXTaskComERV_ParseRemote(U8 *szRemote, U8 size);
+void CXTaskComERV_SetReg(U8 group,U16 addr, U16 value);
 
-private:
-	U8 checkFrame(void);
-	void onError(void);
+U16 OnNewSend(void);
+U16 OnNewRecv(void);
 
-private:
-	U8 m_recvCmd;
-	U8 m_recvParaCnt;
-	U8 m_recvSrc;
-
-	tagXERVCtrlCmd   m_ervctrlCmd;
-	CMQueue *m_queue;
-
-	U16 m_errCnt;
-	U8	m_sendSlaveSddr;
-#if DEBUG_LOG == 1
-	U8 m_debug;
-#endif
-};
 
 #ifdef __cplusplus
 }

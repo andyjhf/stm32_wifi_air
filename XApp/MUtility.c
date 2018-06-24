@@ -1,4 +1,5 @@
 #include "MUtility.h"
+#include <stdlib.h>
 /*
 // Table of CRC values for high¨Corder byte
 static U8 auchCRCHi[] = {
@@ -145,70 +146,77 @@ U8 Asc2Hex(U8 *szChar, U8 charSize, U8 *hex)
 	return (charSize/2);
 }
 
-CMQueue::CMQueue(U8 unit, U8 max)
+CMQueue* CMQueue_Init(U8 unit, U8 max)
 {
-	m_head = 0;
-	m_tail = 0;
-	m_num  = 0;
-
-	m_unit = unit;
-	m_max  = max;
-	m_buff = new U8[m_unit*m_max];
-}
-
-CMQueue::~CMQueue(void)
-{
-	if(m_buff)
+	CMQueue* queue = (CMQueue*)malloc(sizeof(CMQueue));
+	if(queue != NULL)
 	{
-		delete m_buff;
-		m_buff=0;
+		queue->m_buff = (U8*)malloc(unit * max);
+		if(queue->m_buff != NULL)
+		{
+			queue->m_head = 0;
+			queue->m_tail = 0;
+			queue->m_num  = 0;
+			queue->m_unit = unit;
+			queue->m_max = max;
+			return queue;
+		}
+		else
+			free(queue);
 	}
+	return NULL;
 }
 
-U8 CMQueue::Push(void* pNode)
+U8 CMQueue_Push(CMQueue* queue,void* pNode)
 {
-	if(m_num>=m_max)
-		return m_num;
+	if(queue->m_num >= queue->m_max)
+		return queue->m_num;
 
-	for(U8 i=0;i<m_unit;i++)
+	for(U8 i=0;i<queue->m_unit;i++)
 	{
-		m_buff[m_tail*m_unit + i] = ((U8*)pNode)[i];
+		queue->m_buff[queue->m_tail * queue->m_unit + i] = ((U8*)pNode)[i];
 	}
 
-	m_num++;
-	m_tail++;
-	m_tail %= m_max;
+	queue->m_num++;
+	queue->m_tail++;
+	queue->m_tail %= queue->m_max;
 
-	return m_num;
+	return queue->m_num;
 }
 
-U8 CMQueue::Pop(void* pNode)
+U8 CMQueue_Pop(CMQueue* queue,void* pNode)
 {
-	if(0==m_num)
+	if(0 == queue->m_num)
 		return 0;
 
-	for(U8 i=0;i<m_unit;i++)
+	for(U8 i=0;i<queue->m_unit;i++)
 	{
-		((U8*)pNode)[i] = m_buff[m_head*m_unit + i];
+		((U8*)pNode)[i] = queue->m_buff[queue->m_head * queue->m_unit + i];
 	}
 
-	m_num--;
-	m_head++;
-	m_head %= m_max;
+	queue->m_num--;
+	queue->m_head++;
+	queue->m_head %= queue->m_max;
 	
-	if(0==m_num)
+	if(0 == queue->m_num)
 	{
-		Clear();
+		CMQueue_Clear(queue);
 	}
-	return (m_num+1);
+	return (queue->m_num+1);
 }
 
-void CMQueue::Clear(void)
+void CMQueue_Clear(CMQueue* queue)
 {
-	m_head = m_tail = m_num = 0;
+	queue->m_head = queue->m_tail = queue->m_num = 0;
 }
 
-U8 CMQueue::GetNum(void)
+U8 CMQueue_GetNum(CMQueue* queue)
 {
-	return m_num;
+	return queue->m_num;
+}
+
+void CMQueue_Free(CMQueue* queue)
+{
+	free(queue->m_buff);
+	free(queue);
 }

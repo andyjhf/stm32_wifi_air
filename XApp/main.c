@@ -39,9 +39,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "stm32f1xx_hal.h"
-#include "driver_gpio.h"
-#include "driver_rcc.h"
+#include "XApp.h"
+//#include "stm32f1xx_hal.h"
+//#include "driver_gpio.h"
+//#include "driver_rcc.h"
 #include "driver_uart2.h"
 
 osThreadId defaultTaskHandle;
@@ -92,6 +93,7 @@ int main(void)
 	printf("system init\r\n");
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	XTaskEsp8266_Init();
 	
 	osKernelStart();
   /* USER CODE BEGIN 2 */

@@ -2,10 +2,10 @@
 #define	__APP_XAPPDEF_H
 
 #include "driver_gpio.h"
-//#include "driver_rcc.h"
+#include "driver_rcc.h"
 #include "driver_uart1.h"
 //#include "driver_uart2.h"
-//#include "driver_uart6.h"
+#include "driver_esp8266.h"
 //#include "driver_iwdg.h"
 //#include "driver_i2c1.h"
 /*
@@ -20,8 +20,9 @@
 #include "MUtility.h"
 //#include "XTaskHost.h"
 #include "XTaskComERV.h"
-//#include "XTaskComWifi.h"
+#include "XTaskEsp8266.h"
 
+#include "cmsis_os.h"
 #define  SZ_OEM_VER_SIZE  50                       // oem host version prop buffer size
 
 #define OD_DAT_LINK       				0x01                     // ERV link state
