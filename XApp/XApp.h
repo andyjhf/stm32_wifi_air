@@ -6,7 +6,19 @@
 #ifdef __cplusplus
 	extern "C" {
 #endif
-		
+
+// global variables
+extern U8  g_SmartConfig;														//÷«ƒ‹≈‰÷√wifi
+extern U16 g_AirPM1_0;																		//PM1.0
+extern U16 g_AirPM2_5;																		//PM2.5
+extern U16 g_AirPM10;																		//PM10
+extern U16 g_TVOC;
+extern U16 g_HCHO;
+extern U16 g_CO2;
+extern U16 g_Temperature;
+extern U16 g_Humidity;
+
+
 // global variables
 extern U8 g_wifiReset;                             // 1: request to reset wifi module
 extern U8 g_hostReset;                             // 1: request to reset self-host

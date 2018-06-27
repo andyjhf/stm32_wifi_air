@@ -486,6 +486,11 @@
               <FileType>1</FileType>
               <FilePath>..\XApp\XApp.c</FilePath>
             </File>
+            <File>
+              <FileName>XTaskHost.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\XApp\XTaskHost.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

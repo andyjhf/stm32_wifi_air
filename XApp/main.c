@@ -80,51 +80,26 @@ void StartDefaultTask(void const * argument)
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-//	static uint32_t curTick=0;                          // current tick time(ms)
-//	static uint32_t taskTick[3]={0,0,0};              // job rotation tick time(ms)
-//	static uint8_t  slot=0;                             // job rotation No
-  /* USER CODE END 1 */
   HAL_Init();
   SystemClock_Config();
   GPIO_CLK_Init();
 	USART2_Init();
 	LED_Init(LED1);
+	SWI_Init(SW1_1);
 	printf("system init\r\n");
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 	XTaskEsp8266_Init();
+	CXTaskComERV_InitTask();
 	
 	osKernelStart();
   /* USER CODE BEGIN 2 */
   while (1)
   {
-/*		curTick=HAL_GetTick();                     // current tick time
-		if(curTick != taskTick[slot])              // check current task's timetick
-		{
-			switch(slot)                           // which job No
-			{
-				case 0:                            // job 1
-//					taskERV->DoLoop(1);            // do task of ERV communication once 1 millisecond
-						LED_blink(1);
-					break;
-				case 1:                            // job 2
-//					taskHost->DoLoop(1);           // do task of MCU host once 1 millisecond
-					break;
-				case 2:                            // job 3
-//					TransProp();                   // transfer one data to a prop by sequence
-					break;
-			}
-			taskTick[slot] = curTick;              // save job's tick time
-		}
-		slot++;                                    // next job
-		slot %= 3; */
-  /* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
+		osDelay(1000);
 
   }
-  /* USER CODE END 3 */
+  
 
 }
 

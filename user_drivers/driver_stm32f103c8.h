@@ -8,17 +8,17 @@
 #include <string.h>  
 #include <stdbool.h>
 #include "stm32f1xx_hal.h"
-/*
+
 typedef enum 
 {
 	SW1_1 = 0,
 	SW1_2 = 1,
-	SW1_3 = 2,
-	SW1_4 = 3,
-	SW1_5 = 4,
-	SW1_6 = 5
+//	SW1_3 = 2,
+//	SW1_4 = 3,
+//	SW1_5 = 4,
+//	SW1_6 = 5
 } SWI_TypeDef;
-*/
+
 typedef enum 
 {
 	LED1 = 0,
@@ -36,14 +36,14 @@ typedef enum
 #define I2C1_CLK_ENABLE()          __I2C1_CLK_ENABLE()
 */
 /* SWI define ------------------------------------------------------------*/
-/*#define SWIn                       6
+#define SWIn                       2
 #define SWI1_PIN                   GPIO_PIN_13             // SW1-1
 #define SWI1_PORT                  GPIOB
-#define SWI1_CLK                   RCC_AHB1ENR_GPIOBEN
-#define SWI2_PIN                   GPIO_PIN_12             // SW1-2
+//#define SWI1_CLK                   RCC_AHB1ENR_GPIOBEN
+#define SWI2_PIN                   GPIO_PIN_14             // SW1-2
 #define SWI2_PORT                  GPIOB
-#define SWI2_CLK                   RCC_AHB1ENR_GPIOBEN
-#define SWI3_PIN                   GPIO_PIN_10             // SW1-3
+//#define SWI2_CLK                   RCC_AHB1ENR_GPIOBEN
+/*#define SWI3_PIN                   GPIO_PIN_10             // SW1-3
 #define SWI3_PORT                  GPIOB
 #define SWI3_CLK                   RCC_AHB1ENR_GPIOBEN
 #define SWI4_PIN                   GPIO_PIN_1              // SW1-4

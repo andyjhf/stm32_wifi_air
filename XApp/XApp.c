@@ -1,6 +1,16 @@
 #include "XApp.h"
 
 // global variables
+U8  g_SmartConfig = 0;														//÷«ƒ‹≈‰÷√wifi
+U16 g_AirPM1_0;																		//PM1.0
+U16 g_AirPM2_5;																		//PM2.5
+U16 g_AirPM10;																		//PM10
+U16 g_TVOC;
+U16 g_HCHO;
+U16 g_CO2;
+U16 g_Temperature;
+U16 g_Humidity;
+
 U8 g_wifiReset;                                    // 1: request to reset wifi module
 U8 g_hostReset;                                    // 1: request to reset self-host
 U8 g_led2 = 0xff;                                  // set led2 on/off manual or automatic mode(0xff)
@@ -24,49 +34,6 @@ U8  g_szErvcommand[SZ_ERVCMD_SIZE+1];
 U8  g_szModulecommand[SZ_MODULECMD_SIZE+1];
 
 
-
-//// global task object
-//CXTaskComERV  *taskERV  = NULL;                    // ERV communication task
-//CXTaskHost    *taskHost = NULL;                    // Host processing task
-//CXTaskComWifi *taskWifi = NULL;                    // Module communication task
-
-// index of prop table
-#define PI_OEM_HOST_VERSION       0                             // WIFI prop index of table
-#define PI_PLATFORM       				1                             // WIFI prop index of table
-#define PI_MODULE      						2                             // Host prop index of table
-#define PI_ERVINFO       					3                             // ERV sytem prop index of table
-#define PI_ERVCOMMAND    					4                             // ERV control prop index of table
-#define PI_MODULECOMMAND  				5                             // wifi control prop index of table
-#define MAX_PROP_NUMBER						6
-
-// global prop table
-//struct prop prop_table[] = {
-//	{ AYLA_VER_NAME, ATLV_UTF8, NULL,    prop_send_generic, &g_szOemVer[0],      sizeof(g_szOemVer)-1,    AFMT_READ_ONLY},
-//	
-//	{ "W_HW01", ATLV_UTF8, NULL,        prop_send_generic, &g_szPlatform[0],       sizeof(g_szPlatform)-1,    AFMT_READ_ONLY},
-//	{ "W_INFO01", ATLV_UTF8, NULL,        prop_send_generic, &g_szModule[0],       sizeof(g_szModule)-1,    AFMT_READ_ONLY},
-//	{ "Y_ERV01", ATLV_UTF8, NULL,        prop_send_generic, &g_szErvinfo[0],       sizeof(g_szErvinfo)-1,    AFMT_READ_ONLY},
-//	{ "Y_RMT01", ATLV_UTF8, set_ervcommand, prop_send_generic, &g_szErvcommand[0],   sizeof(g_szErvcommand)-1, },
-//	{ "W_RMT01", ATLV_UTF8, set_modulecommand,  prop_send_generic, &g_szModulecommand[0],    sizeof(g_szModulecommand)-1, },
-//	
-//	{ "SCHE_01", ATLV_SCHED, set_sched, NULL, &g_timer[0]},
-//	{ "SCHE_02", ATLV_SCHED, set_sched, NULL, &g_timer[1]},
-//	{ "SCHE_03", ATLV_SCHED, set_sched, NULL, &g_timer[2]},
-//	{ "SCHE_04", ATLV_SCHED, set_sched, NULL, &g_timer[3]},
-//	{ "SCHE_05", ATLV_SCHED, set_sched, NULL, &g_timer[4]},
-//	{ "SCHE_06", ATLV_SCHED, set_sched, NULL, &g_timer[5]},
-//	{ "SCHE_07", ATLV_SCHED, set_sched, NULL, &g_timer[6]},
-//	{ "SCHE_08", ATLV_SCHED, set_sched, NULL, &g_timer[7]},
-//	{ "SCHE_09", ATLV_SCHED, set_sched, NULL, &g_timer[8]},
-//	{ "SCHE_10", ATLV_SCHED, set_sched, NULL, &g_timer[9]},
-
-//	// keep the last prop null
-//	{ NULL }
-//};
-
-// global prop count
-//uint8_t prop_count = (sizeof(prop_table) / sizeof(prop_table[0])) - 1;
-
 void InitProp(void)
 {
 	memset(g_szOemVer,         '\0', sizeof(g_szOemVer));
@@ -76,79 +43,7 @@ void InitProp(void)
 	memset(g_szErvcommand,           '\0', sizeof(g_szErvcommand));
 	memset(g_szModulecommand,          '\0', sizeof(g_szModulecommand));
 
-//	memset(g_timer, 0, sizeof(g_timer));
-
-//	memcpy(g_szOemVer,     OEM_HOST_VER, strlen(OEM_HOST_VER)); 
-//	memcpy(g_timer[0].name,  "SCHE_01", 7);
-//	memcpy(g_timer[1].name,  "SCHE_02", 7);
-//	memcpy(g_timer[2].name,  "SCHE_03", 7);
-//	memcpy(g_timer[3].name,  "SCHE_04", 7);
-//	memcpy(g_timer[4].name,  "SCHE_05", 7);
-//	memcpy(g_timer[5].name,  "SCHE_06", 7);
-//	memcpy(g_timer[6].name,  "SCHE_07", 7);
-//	memcpy(g_timer[7].name,  "SCHE_08", 7);
-//	memcpy(g_timer[8].name,  "SCHE_09", 7);
-//	memcpy(g_timer[9].name,  "SCHE_10", 7);
-
 }
-
-void TransProp(void)
-{
-	static U8 tran=0;
-	U8 size;                                       // size of the source unit data
-
-	switch(tran)
-	{
-	case 0:                                        // host prop
-		size  = sizeof(g_platform);                    // size of host unit data
-		Hex2Asc(&g_platform[0], size, &g_szPlatform[0]);   // encode BCD
-		g_szPlatform[size*2] = 0x00;                   // add '\0' to the tail of string
-		break;
-	case 1:                                        // ERV system prop
-		size  = sizeof(g_module);                     // size of ERV system data
-		Hex2Asc(&g_module[0], size, &g_szModule[0]);  // encode BCD to ERV system prop
-		g_szModule[size*2] = 0x00;                 // add '\0' to the tail of string
-		break;
-	case 2:                                        // 1# outdoor prop
-		size  = sizeof(g_ervinfo);                     // size of ERV system data
-		Hex2Asc(&g_ervinfo[0], size, &g_szErvinfo[0]);  // encode BCD to ERV system prop
-		g_szErvinfo[size*2] = 0x00;                 // add '\0' to the tail of string
-		break;
-	case 3:                                        // 2# outdoor prop
-//		size  = sizeof(g_ervcommand);                     // size of ERV system data
-//		Hex2Asc(&g_ervcommand[0], size, &g_szErvcommand[0]);  // encode BCD to ERV system prop
-//		g_szErvcommand[size*2] = 0x00;                 // add '\0' to the tail of string
-		break;
-	case 4:                                        // 3# outdoor prop
-//		size  = sizeof(g_modulecommand);                     // size of ERV system data
-//		Hex2Asc(&g_modulecommand[0], size, &g_szModulecommand[0]);  // encode BCD to ERV system prop
-//		g_szModulecommand[size*2] = 0x00;                 // add '\0' to the tail of string
-		break;
-	default:                                       // indoor list prop from 1 to 8
-		break;
-	}
-	tran++;                                        // next prop to be converted
-	tran %= MAX_PROP_NUMBER;                                    // turn to head
-
-	// TODO:DEBUG
-//	static U32 SendCnt=0;
-//	SendCnt++;
-//	if(1000*30==SendCnt)
-//	{
-//		SendCnt=0;
-//			for(U8 i=1; i<=PI_IDU_08; i++)
-//			{
-//				//if(prop_table[i].name && prop_table[i].name_len>0)
-//				if(prop_table[i].name)
-//				{
-//					prop_table[i].send_mask = valid_dest_mask;
-//					prop_table[i].echo = 1;
-//				}
-//			}
-//	}
-}
-
-
 
 void XApp_Init(void)
 {

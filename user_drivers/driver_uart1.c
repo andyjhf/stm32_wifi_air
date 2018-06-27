@@ -61,7 +61,7 @@ void USART1_Init(void)
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
 	huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -103,7 +103,7 @@ void USART1_PreReceive(void)
 
 	g_usart1.rxStart= 0;                           // clear buffer and set receive state
 	g_usart1.rxEnd  = 0;
-//	g_usart1.status = USART_RX;                    // set usart state for receving
+	g_usart1.status = USART_RX;                    // set usart state for receving
 }
 
 void USART1_PreTransmit(void)
@@ -117,7 +117,7 @@ void USART1_PreTransmit(void)
 //	RS485_DE_PORT->BSRRL = RS485_DE_PIN;           // set transmit status(1) of RS485 chip
 	g_usart1.txStart  = 0;                         // clear buffer and set transmit state
 	g_usart1.txEnd    = 0;                         // note: do not clear end 
-//	g_usart1.status = USART_TX;                    // set usart state for transmitting
+	g_usart1.status = USART_TX;                    // set usart state for transmitting
 }
 
 void USART1_StartSend(void)
@@ -144,8 +144,8 @@ uint8_t USART1_Write(uint8_t* pData, uint8_t len)
 	}
 	return g_usart1.txEnd;
 }
-/*
+
 uint8_t USART1_GetStatus(void)
 {
 	return g_usart1.status;
-}*/
+}

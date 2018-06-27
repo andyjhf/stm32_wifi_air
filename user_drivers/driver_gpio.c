@@ -13,11 +13,11 @@ static GPIO_TypeDef*  const GPIO_LED_PORT[LEDn] = {LED1_PORT,LED2_PORT};
 static uint16_t       const GPIO_LED_PIN[LEDn]  = {LED1_PIN, LED2_PIN};
 //static uint32_t       const GPIO_LED_CLK[LEDn]  = {LED1_CLK, LED2_CLK};
 static uint8_t        GPIO_LED_STATUS[LEDn]     = {0,0};
-/*	
-static GPIO_TypeDef*  const GPIO_SWI_PORT[SWIn] = {SWI1_PORT,SWI2_PORT,SWI3_PORT,SWI4_PORT,SWI5_PORT,SWI6_PORT};
-static uint16_t       const GPIO_SWI_PIN[SWIn]  = {SWI1_PIN, SWI2_PIN, SWI3_PIN, SWI4_PIN, SWI5_PIN, SWI6_PIN};
-static uint32_t       const GPIO_SWI_CLK[SWIn]  = {SWI1_CLK, SWI2_CLK, SWI3_CLK, SWI4_CLK, SWI5_CLK, SWI6_CLK};
-*/
+	
+static GPIO_TypeDef*  const GPIO_SWI_PORT[SWIn] = {SWI1_PORT,SWI2_PORT};
+static uint16_t       const GPIO_SWI_PIN[SWIn]  = {SWI1_PIN, SWI2_PIN};
+//static uint32_t       const GPIO_SWI_CLK[SWIn]  = {SWI1_CLK, SWI2_CLK, SWI3_CLK, SWI4_CLK, SWI5_CLK, SWI6_CLK};
+
  
 void LED_Init(LED_TypeDef led)
 {
@@ -95,7 +95,7 @@ uint8_t LED_Get(LED_TypeDef led)
   assert_param((led<LEDn));
 	return GPIO_LED_STATUS[led];
 }
-/*
+
 void SWI_Init(SWI_TypeDef swi)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -104,13 +104,13 @@ void SWI_Init(SWI_TypeDef swi)
   assert_param((swi<SWIn));
 	
 	// Enable the SWI Clock
-	RCC->AHB1ENR |= (GPIO_SWI_CLK[swi]);
+//	RCC->AHB1ENR |= (GPIO_SWI_CLK[swi]);
 
 	// Configure SWI pin as input
 	GPIO_InitStructure.Pin  = GPIO_SWI_PIN[swi];
 	GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
-	GPIO_InitStructure.Speed  = GPIO_SPEED_LOW;
+	GPIO_InitStructure.Speed  = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIO_SWI_PORT[swi], &GPIO_InitStructure);
 }
 
@@ -121,7 +121,7 @@ uint8_t SWI_GetState(SWI_TypeDef swi)
 
 	return (HAL_GPIO_ReadPin(GPIO_SWI_PORT[swi], GPIO_SWI_PIN[swi]) == GPIO_PIN_SET);
 }
-
+/*
 void WIFI_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;

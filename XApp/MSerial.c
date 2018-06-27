@@ -20,11 +20,11 @@ __weak U8   USART1_GetStatus(void)          { return 0;} // get USART1 state
 __weak U16 OnNewSend()  {return 0;}           // FALSE:no data to send
 __weak U16 OnNewRecv()  {return 0;}           // FALSE:do not deal the received data
 
-static void OnSend();                                 // handle the data should be sent
-static void Waiting();                                // wait a lillte interval between receive completion and send starting, data line output mode
-static void Sending();                                // send one by one and check whether the end of transmitting 
+static void OnSend(void);                                 // handle the data should be sent
+static void Waiting(void);                                // wait a lillte interval between receive completion and send starting, data line output mode
+static void Sending(void);                                // send one by one and check whether the end of transmitting 
 static void Receiving(U16 tmOnce);                    // receive one by one and check whether the completion of receiving
-static void OnReceive();                              // handle the received data
+static void OnReceive(void);                              // handle the received data
 
 #define S_ONSEND     0                             // OnSend state
 #define S_WAITING    1                             // waiting state
@@ -35,18 +35,18 @@ static void OnReceive();                              // handle the received dat
 static U8 m_state   = S_ONSEND;                         // state
 static U16 m_stateCnt= 0;                                 // time count of one state
 
-static U8  m_rxBuf[256];                              // received data buffer
-static U8  m_rxLen = 0;                                   // received data size
+U8  m_rxBuf[256];                              // received data buffer
+U8  m_rxLen = 0;                                   // received data size
 
-static U8  m_txBuf[256];                              // transmit data buffer
-static U8  m_txLen = 0;                                   // transmit data size
+U8  m_txBuf[256];                              // transmit data buffer
+U8  m_txLen = 0;                                   // transmit data size
 
 static U16 m_idleCnt = 0;                                 // timer count of interval between one char and one char
-static U16 m_onesendCnt = 1000;															//timer count of send frequency
+static U16 m_onesendCnt = 15000;															//timer count of send frequency
 
-static U16 m_tmRxOver = 5;                                // configured interval time
+static U16 m_tmRxOver = 15;                                // configured interval time
 static U16 m_tmNoAck = 2000;                                 // configured no acknowledge time
-static U16 m_tmWait = 5;                                  // configured waiting time
+static U16 m_tmWait = 15;                                  // configured waiting time
 
 
 void MSerial_DoLoop(U16 tmOnce)

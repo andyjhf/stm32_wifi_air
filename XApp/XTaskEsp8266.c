@@ -2,7 +2,7 @@
 #include "XApp.h"
 
 osThreadId XTaskEsp8266Handle;
-static uint8_t g_SmartConfig = 0;
+
 static uint8_t m_linked_ap = 0;
 static uint8_t m_linked_server = 0;
 

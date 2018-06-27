@@ -7,6 +7,11 @@
 
 #include "MUtility.h"
 
+extern U8  m_rxBuf[256];                              // received data buffer
+extern U8  m_rxLen;                                   // received data size
+extern U8  m_txBuf[256];                              // transmit data buffer
+extern U8  m_txLen;                                   // transmit data size
+
 void USART6_OffReceive(void);                      // turn off receiver
 void USART6_PreReceive(void);                      // prepare for receiving
 void USART6_PreTransmit(void);                     // prepare for transmitting
