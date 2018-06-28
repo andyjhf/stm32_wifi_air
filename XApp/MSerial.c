@@ -112,7 +112,7 @@ static void Sending(void)
 	{
 		m_state = S_RECEIVE;                       // change to receive state
 		m_rxLen = 0;                               // clear receiver buffer
-		USART1_PreReceive();                       // set uart to rx state
+//		USART1_PreReceive();                       // set uart to rx state
 	}
 }
 
@@ -129,7 +129,7 @@ static void Receiving(U16 tmOnce)
 	if((m_rxLen>0 && m_idleCnt>=m_tmRxOver) ||     // frame end, 
 		m_idleCnt>m_tmNoAck || m_rxLen>=255)       // timeout, out of buffer
 	{
-		USART1_OffReceive();                       // close uart rx function
+//		USART1_OffReceive();                       // close uart rx function
 		m_state = S_ONRECV;                        // change to OnReceive state
 	}
 }

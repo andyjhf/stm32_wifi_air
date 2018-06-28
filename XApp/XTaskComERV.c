@@ -8,6 +8,8 @@
 #define CHARACTER_BYTE0							0x42
 #define CHARACTER_BYTE1							0x4D
 
+#define TIMEOUT_LOOP								5
+
 #define CMD_AIR_READ_GENERAL_DATA				0xab
 #define CMD_AIR_READ_ALL_DATA						0xac
 #define CMD_AIR_MODULE_SLEEP_CTRL				0xe4
@@ -26,11 +28,11 @@ static void onError(void);
 
 void StartXTaskAirModule(void const * argument)
 {
-	osDelay(30000);     //等待空气检测模块稳定
+//	osDelay(30000);     //等待空气检测模块稳定
 	for(;;)
   {
-		MSerial_DoLoop(5);
-		osDelay(5);
+		MSerial_DoLoop(TIMEOUT_LOOP);
+		osDelay(TIMEOUT_LOOP);
 	}
 
 }
@@ -42,6 +44,7 @@ void CXTaskComERV_InitTask(void)
 //	m_queue = CMQueue_Init(sizeof(XERVCtrlCmd),20);
 
 	m_errCnt  = 0;
+
 	osThreadDef(XTaskAirModule, StartXTaskAirModule, osPriorityBelowNormal, 0, 128);
   XTaskAirModuleHandle = osThreadCreate(osThread(XTaskAirModule), NULL);
 }
@@ -61,28 +64,33 @@ U16 OnNewSend(void)
 	m_txLen = 7;
 	
 	m_sendCmd = m_txBuf[2];
+	printf("send\r\n");
 	return 1;
 }
 
 U16 OnNewRecv(void)
 {
-	if (0==checkFrame())                           // 1.check frame(length,header/tail,CRC)
+	uint8_t* p = m_rxBuf;
+	if (1==checkFrame())                           // 1.check frame(length,header/tail,CRC)
 	{
 		onError();
 		return 0;
 	}
+	m_errCnt = *p;
 	m_errCnt = 0;
 
 	if(m_sendCmd == CMD_AIR_READ_ALL_DATA)
 	{
-		g_AirPM1_0    = (m_rxBuf[INDEX_AIR_PM1_0]<<8) | m_rxBuf[INDEX_AIR_PM1_0];
-		g_AirPM2_5    = (m_rxBuf[INDEX_AIR_PM2_5]<<8) | m_rxBuf[INDEX_AIR_PM2_5];
-		g_AirPM10     = (m_rxBuf[INDEX_AIR_PM10]<<8) | m_rxBuf[INDEX_AIR_PM10];
-		g_TVOC        = (m_rxBuf[INDEX_TVOC]<<8) | m_rxBuf[INDEX_TVOC];
-		g_HCHO        = (m_rxBuf[INDEX_HCHO]<<8) | m_rxBuf[INDEX_HCHO];
-		g_CO2         = (m_rxBuf[INDEX_CO2]<<8) | m_rxBuf[INDEX_CO2];
-		g_Temperature = (m_rxBuf[INDEX_TEMP]<<8) | m_rxBuf[INDEX_TEMP];
-		g_Humidity    = (m_rxBuf[INDEX_HUMI]<<8) | m_rxBuf[INDEX_HUMI];
+		g_AirPM1_0    = (m_rxBuf[INDEX_AIR_PM1_0]<<8) | m_rxBuf[INDEX_AIR_PM1_0+1];
+		g_AirPM2_5    = (m_rxBuf[INDEX_AIR_PM2_5]<<8) | m_rxBuf[INDEX_AIR_PM2_5+1];
+		g_AirPM10     = (m_rxBuf[INDEX_AIR_PM10]<<8) | m_rxBuf[INDEX_AIR_PM10+1];
+		g_TVOC        = (m_rxBuf[INDEX_TVOC]<<8) | m_rxBuf[INDEX_TVOC+1];
+		g_HCHO        = (m_rxBuf[INDEX_HCHO]<<8) | m_rxBuf[INDEX_HCHO+1];
+		g_CO2         = (m_rxBuf[INDEX_CO2]<<8) | m_rxBuf[INDEX_CO2+1];
+		g_Temperature = (m_rxBuf[INDEX_TEMP]<<8) | m_rxBuf[INDEX_TEMP+1];
+		g_Humidity    = (m_rxBuf[INDEX_HUMI]<<8) | m_rxBuf[INDEX_HUMI+1];
+		printf("temp = %d.%d\r\n",g_Temperature/10,g_Temperature%10);
+		printf("g_AirPM2_5 = %d\r\n",g_AirPM2_5);
 	}
 	else if(m_sendCmd == CMD_AIR_READ_GENERAL_DATA)
 	{
@@ -111,19 +119,28 @@ void CXTaskComERV_SetReg(U8 group,U16 addr, U16 value)
 */
 static U8 checkFrame(void)
 {
+	uint32_t i;
 	// check frame length
 	if(m_rxLen<8)
 	{
+		printf("timeout\r\n");
 		return 1;
 	}
+	for(i=0;i<m_rxLen;i++)
+	{
+		printf("%02x ",m_rxBuf[i]);
+	}
+	printf("\r\n");
 	if((CHARACTER_BYTE0 != m_rxBuf[0])&&(CHARACTER_BYTE1 != m_rxBuf[1]))
 	{
+		printf("header error\r\n");
 		return 1;
 	}
 
 	// check frame CRC (TODO:do not check CRC, reduce the execution time)
 	if(checkSum(&m_rxBuf[0], m_rxLen-2)!= ((m_rxBuf[m_rxLen-2]<<8)|m_rxBuf[m_rxLen-1]))
 	{
+		printf("sum error\r\n");
 		return 1;
 	}
 

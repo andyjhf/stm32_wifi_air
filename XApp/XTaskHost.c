@@ -49,6 +49,7 @@ void CXTaskHost_InitTask(void)
 
 void CXTaskHost_DoLoop(U16 tmOnce)
 {
+	U16 i;
 	// sampling
 	if(m_samplingCnt>=m_tmSampling)
 	{
@@ -138,7 +139,7 @@ void CXTaskHost_DoLoop(U16 tmOnce)
 	{
 		g_wifiReset= 0;
 //		WIFI_Reset(1);                             // set wifi module reset pin low level
-		for (U16 i=0; i<2000; i++);                // keep a short time(167.5us, wifi module reset OK)
+		for (i=0; i<2000; i++);                // keep a short time(167.5us, wifi module reset OK)
 //		WIFI_Reset(0);                             // return to high level
 	}
 	else

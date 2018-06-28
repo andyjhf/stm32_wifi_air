@@ -1,5 +1,5 @@
-#ifndef __DRIVER_UART6_H
-#define __DRIVER_UART6_H
+#ifndef __DRIVER_UART1_H
+#define __DRIVER_UART1_H
 
 #ifdef __cplusplus
 	extern "C" {

@@ -38,12 +38,14 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+//#include "cmsis_os.h"
 #include "XApp.h"
 //#include "stm32f1xx_hal.h"
 //#include "driver_gpio.h"
 //#include "driver_rcc.h"
+#include "driver_uart1.h"
 #include "driver_uart2.h"
+
 
 osThreadId defaultTaskHandle;
 
@@ -86,10 +88,12 @@ int main(void)
 	USART2_Init();
 	LED_Init(LED1);
 	SWI_Init(SW1_1);
+	
 	printf("system init\r\n");
+	USART1_Init();
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
-	XTaskEsp8266_Init();
+//	XTaskEsp8266_Init();
 	CXTaskComERV_InitTask();
 	
 	osKernelStart();

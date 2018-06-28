@@ -106,7 +106,8 @@ U16 IDCOM_CRC16(const U8 *buf, U16 srcLen)
 U8 MakeBcc(U8 *data, U8 size)
 {
 	U8 bcc=0;                                      // bcc first value
-	for(U8 i=0;i<size;i++)
+	U8 i;
+	for(i=0;i<size;i++)
 	{
 		bcc ^= data[i];                            // xor
 	}
@@ -117,7 +118,8 @@ U8 Hex2Asc(U8 *hex, U8 hexSize, U8 *szChar)
 {
 	U8 H4 = 0;                                     // high 4 bits
 	U8 L4 = 0;                                     // low 4 bits
-	for(U8 i=0; i<hexSize; i++)                    // eg:0x12 ==> "12"
+	U8 i;
+	for(i=0; i<hexSize; i++)                    // eg:0x12 ==> "12"
 	{                                              //    0x1a ==> "1a" (low case)
 		H4 = hex[i]>>4;                            // get high 4 bis of the source
 		L4 = hex[i]&0x0f;                          // get low 4 bits of the source
@@ -131,7 +133,8 @@ U8 Asc2Hex(U8 *szChar, U8 charSize, U8 *hex)
 {
 	char H4 = 0;                                   // high 4 bits
 	char L4 = 0;                                   // low 4 bits
-	for(U8 i=0; i<charSize/2; i++)                 // eg: "12"     ==> 0x12
+	U8 i;
+	for(i=0; i<charSize/2; i++)                 // eg: "12"     ==> 0x12
 	{                                              //     "1a"/"1A"==> 0x1a  case-insensitive
 		H4 = *szChar++;                            // get the first char of the source
 		L4 = *szChar++;                            // get the second char of the source
@@ -169,10 +172,11 @@ CMQueue* CMQueue_Init(U8 unit, U8 max)
 
 U8 CMQueue_Push(CMQueue* queue,void* pNode)
 {
+	U8 i;
 	if(queue->m_num >= queue->m_max)
 		return queue->m_num;
 
-	for(U8 i=0;i<queue->m_unit;i++)
+	for(i=0;i<queue->m_unit;i++)
 	{
 		queue->m_buff[queue->m_tail * queue->m_unit + i] = ((U8*)pNode)[i];
 	}
@@ -186,10 +190,11 @@ U8 CMQueue_Push(CMQueue* queue,void* pNode)
 
 U8 CMQueue_Pop(CMQueue* queue,void* pNode)
 {
+	U8 i;
 	if(0 == queue->m_num)
 		return 0;
 
-	for(U8 i=0;i<queue->m_unit;i++)
+	for(i=0;i<queue->m_unit;i++)
 	{
 		((U8*)pNode)[i] = queue->m_buff[queue->m_head * queue->m_unit + i];
 	}

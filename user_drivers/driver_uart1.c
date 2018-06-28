@@ -79,7 +79,9 @@ void USART1_Init(void)
 	HAL_NVIC_EnableIRQ(USART1_IRQn);
 
 	// Set USART1 receive state
-	USART1_PreReceive();
+	__HAL_UART_ENABLE_IT(&huart1,UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(&huart1,UART_IT_TC);
+//	USART1_PreTransmit();
 
 	// Enable USART1
 	__HAL_UART_ENABLE(&huart1);
@@ -94,25 +96,24 @@ void USART1_PreReceive(void)
 {
 	// note: STM32F411 can be cleared by writing a '0'
 	USART1->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
-	USART1->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
-	USART1->CR1 &= ~USART_CR1_TCIE;                // disable TC interrupt
-	USART1->CR1 |= USART_CR1_RXNEIE;               // enable RXNE interrupt
-	USART1->CR1 |= USART_CR1_RE;                   // Receiver Enable
-
-//	RS485_DE_PORT->BSRRH = RS485_DE_PIN;           // reset receive status(0) of RS485 chip
+//	USART1->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
+//	USART1->CR1 &= ~USART_CR1_TCIE;                // disable TC interrupt
+//	USART1->CR1 |= USART_CR1_RXNEIE;               // enable RXNE interrupt
+//	USART1->CR1 |= USART_CR1_RE;                   // Receiver Enable
 
 	g_usart1.rxStart= 0;                           // clear buffer and set receive state
 	g_usart1.rxEnd  = 0;
+//	RS485_DE_PORT->BSRRH = RS485_DE_PIN;           // reset receive status(0) of RS485 chip
 	g_usart1.status = USART_RX;                    // set usart state for receving
 }
 
 void USART1_PreTransmit(void)
 {
-	USART1->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
+//	USART1->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
 	USART1->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
-	USART1->CR1 &= ~USART_CR1_RXNEIE;              // disable RXNE interrupt
-	USART1->CR1 |= USART_CR1_TCIE;                 // enable TC interrupt
-	USART1->CR1 &= ~USART_CR1_RE;                  // Receiver disable
+//	USART1->CR1 &= ~USART_CR1_RXNEIE;              // disable RXNE interrupt
+//	USART1->CR1 |= USART_CR1_TCIE;                 // enable TC interrupt
+//	USART1->CR1 &= ~USART_CR1_RE;                  // Receiver disable
 
 //	RS485_DE_PORT->BSRRL = RS485_DE_PIN;           // set transmit status(1) of RS485 chip
 	g_usart1.txStart  = 0;                         // clear buffer and set transmit state

@@ -104,7 +104,7 @@ void XApp_Run(void)
 //					taskHost->DoLoop(1);           // do task of MCU host once 1 millisecond
 					break;
 				case 2:                            // job 3
-					TransProp();                   // transfer one data to a prop by sequence
+//					TransProp();                   // transfer one data to a prop by sequence
 					break;
 			}
 			taskTick[slot] = curTick;              // save job's tick time
