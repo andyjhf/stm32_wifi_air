@@ -68,7 +68,7 @@ typedef enum
 /* WIFI define-------------------------------------------------------------*/
 /******************************** ESP8266 连接引脚定义 ***********************************/ 
 #define      macESP8266_CH_PD_PORT                            GPIOB
-#define      macESP8266_CH_PD_PIN                             GPIO_PIN_7
+#define      macESP8266_CH_PD_PIN                             GPIO_PIN_15
 
 #define      macESP8266_RST_PORT                              GPIOB
 #define      macESP8266_RST_PIN                               GPIO_PIN_12

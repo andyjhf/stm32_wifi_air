@@ -27,6 +27,13 @@ typedef enum{
 	
 
 typedef enum{
+	AP_Connect   = 2,
+	TCP_UDP_Connect = 3,
+	TCP_UDP_Disconnect = 4,
+	AP_Disconnect   = 5,
+} ENUM_Connect_Status_TypeDef;
+	
+typedef enum{
 	Multiple_ID_0 = 0,
 	Multiple_ID_1 = 1,
 	Multiple_ID_2 = 2,
@@ -34,7 +41,6 @@ typedef enum{
 	Multiple_ID_4 = 4,
 	Single_ID_0 = 5,
 } ENUM_ID_NO_TypeDef;
-	
 
 typedef enum{
 	OPEN = 0,
@@ -83,9 +89,11 @@ void       ESP8266_ExitUnvarnishSend           ( void );
 uint8_t    ESP8266_SendString                  ( FunctionalState enumEnUnvarnishTx, char * pStr, uint32_t ulStrLength, ENUM_ID_NO_TypeDef ucId );
 uint8_t*   ESP8266_ReceiveString               ( FunctionalState enumEnUnvarnishTx );
 uint8_t    ESP8266_SmartConfig(void);
-void       ESP8266_UnvarnishReceive(void);
-uint8_t    ESP8266_ReceiveStatusString(char * string1, char * string2, uint32_t timeout);
+char*			 ESP8266_Receive(FunctionalState enumEnUnvarnishTx, uint32_t timeout);
+uint8_t ESP8266_ReceiveStatusString(char * string1, uint32_t timeout);
 void       ESP8266_RxBufClear(void);
 uint8_t    ESP8266_Net_Auto_Connect(void);
+uint8_t ESP8266_Get_Connect_AP_Status(void);
+uint8_t ESP8266_Disconnet_Link_Server(void);
 
 #endif

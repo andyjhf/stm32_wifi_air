@@ -82,19 +82,21 @@ void StartDefaultTask(void const * argument)
   */
 int main(void)
 {
+	
   HAL_Init();
   SystemClock_Config();
   GPIO_CLK_Init();
 	USART2_Init();
 	LED_Init(LED1);
 	SWI_Init(SW1_1);
-	
+	if(!SWI_GetState(SW1_1))
+		g_SmartConfig = 1;
 	printf("system init\r\n");
 	USART1_Init();
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
-//	XTaskEsp8266_Init();
-	CXTaskComERV_InitTask();
+	XTaskEsp8266_Init();
+//	CXTaskComERV_InitTask();
 	
 	osKernelStart();
   /* USER CODE BEGIN 2 */

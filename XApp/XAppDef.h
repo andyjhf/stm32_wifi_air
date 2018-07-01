@@ -23,6 +23,10 @@
 #include "XTaskEsp8266.h"
 
 #include "cmsis_os.h"
+
+#define      macUser_ESP8266_TcpServer_IP                 "183.230.40.33"      //要连接的服务器的 IP
+#define      macUser_ESP8266_TcpServer_Port               "80"               //要连接的服务器的端口
+
 #define  SZ_OEM_VER_SIZE  50                       // oem host version prop buffer size
 
 #define OD_DAT_LINK       				0x01                     // ERV link state

@@ -64,7 +64,7 @@ U16 OnNewSend(void)
 	m_txLen = 7;
 	
 	m_sendCmd = m_txBuf[2];
-	printf("send\r\n");
+//	printf("send\r\n");
 	return 1;
 }
 
@@ -89,8 +89,8 @@ U16 OnNewRecv(void)
 		g_CO2         = (m_rxBuf[INDEX_CO2]<<8) | m_rxBuf[INDEX_CO2+1];
 		g_Temperature = (m_rxBuf[INDEX_TEMP]<<8) | m_rxBuf[INDEX_TEMP+1];
 		g_Humidity    = (m_rxBuf[INDEX_HUMI]<<8) | m_rxBuf[INDEX_HUMI+1];
-		printf("temp = %d.%d\r\n",g_Temperature/10,g_Temperature%10);
-		printf("g_AirPM2_5 = %d\r\n",g_AirPM2_5);
+//		printf("temp = %d.%d\r\n",g_Temperature/10,g_Temperature%10);
+//		printf("g_AirPM2_5 = %d\r\n",g_AirPM2_5);
 	}
 	else if(m_sendCmd == CMD_AIR_READ_GENERAL_DATA)
 	{
@@ -128,9 +128,9 @@ static U8 checkFrame(void)
 	}
 	for(i=0;i<m_rxLen;i++)
 	{
-		printf("%02x ",m_rxBuf[i]);
+//		printf("%02x ",m_rxBuf[i]);
 	}
-	printf("\r\n");
+//	printf("\r\n");
 	if((CHARACTER_BYTE0 != m_rxBuf[0])&&(CHARACTER_BYTE1 != m_rxBuf[1]))
 	{
 		printf("header error\r\n");

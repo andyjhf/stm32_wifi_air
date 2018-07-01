@@ -1,3 +1,4 @@
+#include <math.h>
 #include "driver_esp8266.h"
 #include "driver_common.h"
 #include "driver_delay.h"
@@ -26,7 +27,14 @@ UART_HandleTypeDef huart3;
 
 struct  STRUCT_USARTx_Fram strEsp8266_Fram_Record = { 0 };
 
-
+uint32_t Asc2Dec(uint8_t *szChar, uint8_t charSize)
+{
+	uint8_t i;
+	uint32_t result = 0;
+	for(i=0; i<charSize; i++)
+	 result += *(szChar+i) * pow(10,charSize-i-1);
+	return result;
+}
 
 /**
   * @brief  ESP8266初始化函数
@@ -39,7 +47,7 @@ void ESP8266_Init( void )
 	ESP8266_USART_Config();
 	
 	macESP8266_RST_HIGH_LEVEL();
-	macESP8266_CH_DISABLE();
+	macESP8266_CH_ENABLE();
 }
 
 
@@ -58,7 +66,7 @@ static void ESP8266_GPIO_Config( void )
 	// Configure the GPIO_LED pin
 	GPIO_InitStructure.Pin   = macESP8266_CH_PD_PIN;
 	GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStructure.Pull  = GPIO_NOPULL;
+	GPIO_InitStructure.Pull  = GPIO_PULLUP;
 	GPIO_InitStructure.Speed  = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(macESP8266_CH_PD_PORT, &GPIO_InitStructure);
 	
@@ -197,8 +205,11 @@ void ESP8266_Rst( void )
 	
 	#else
 	 macESP8266_RST_LOW_LEVEL();
-	 Delay_ms( 500 ); 
+	 Delay_ms( 1000 ); 
 	 macESP8266_RST_HIGH_LEVEL();
+	macESP8266_CH_DISABLE();
+	Delay_ms( 120000 );
+	macESP8266_CH_ENABLE();
 	#endif
 
 }
@@ -220,8 +231,7 @@ uint8_t ESP8266_Cmd( char * cmd, char * reply1, char * reply2, uint32_t waittime
 	uint32_t check_cnt,check_time = 50;
 	uint32_t length_bak = 0;
 	
-	ESP8266_RxBufClear();
-//	strEsp8266_Fram_Record.InfBit.FramLength = 0;               //从新开始接收新的数据包
+	strEsp8266_Fram_Record.InfBit.FramLength = 0;               //从新开始接收新的数据包
 //	memset(strEsp8266_Fram_Record.Data_RX_BUF, 0, sizeof(strEsp8266_Fram_Record.Data_RX_BUF));
 	macESP8266_Usart( "%s\r\n", cmd );
 	macPC_Usart("%s\r\n", cmd);
@@ -249,6 +259,7 @@ uint8_t ESP8266_Cmd( char * cmd, char * reply1, char * reply2, uint32_t waittime
 	//			else
 	//				return 1;
 	//		}
+			strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength] = 0;
 			if((reply1 != 0) && ( reply2 != 0))
 				if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply1) 
 					&& strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply2))
@@ -267,8 +278,9 @@ uint8_t ESP8266_Cmd( char * cmd, char * reply1, char * reply2, uint32_t waittime
 					result = 1;
 		}
 	}
+	strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength] = 0;
 	macPC_Usart( "%s", strEsp8266_Fram_Record.Data_RX_BUF );
-	ESP8266_RxBufClear();
+	strEsp8266_Fram_Record.InfBit.FramLength = 0;
 	return result;
 }
 
@@ -446,10 +458,16 @@ uint8_t ESP8266_Link_Server( ENUM_NetPro_TypeDef enumE, char * ip, char * ComNum
   else
 	  sprintf( cCmd, "AT+CIPSTART=%s", cStr );
 
-	return ESP8266_Cmd( cCmd, "OK", 0, 10000 );
+	return ESP8266_Cmd( cCmd, "OK", 0, 5000 );
 	
 }
 
+
+uint8_t ESP8266_Disconnet_Link_Server(void)
+{
+	return ESP8266_Cmd( "AT+CIPCLOSE", "OK", 0, 500 );
+
+}
 
 /*
  * 函数名：ESP8266_StartOrShutServer
@@ -530,38 +548,27 @@ uint8_t ESP8266_Get_IdLinkStatus( void )
 	
 	if( !ESP8266_Cmd( "AT+CIPSTATUS", "OK", 0, 500 ) )
 	{
-		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+CIPSTATUS:0," ) )
-			ucIdLinkStatus |= 0x01;
-		else 
-			ucIdLinkStatus &= ~ 0x01;
+		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "STATUS:2" ) )
+			ucIdLinkStatus = AP_Connect;
 		
-		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+CIPSTATUS:1," ) )
-			ucIdLinkStatus |= 0x02;
-		else 
-			ucIdLinkStatus &= ~ 0x02;
+		else if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "STATUS:3" ) )
+			ucIdLinkStatus = TCP_UDP_Connect;
 		
-		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+CIPSTATUS:2," ) )
-			ucIdLinkStatus |= 0x04;
-		else 
-			ucIdLinkStatus &= ~ 0x04;
+		else if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "STATUS:4" ) )
+			ucIdLinkStatus = TCP_UDP_Disconnect;
 		
-		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+CIPSTATUS:3," ) )
-			ucIdLinkStatus |= 0x08;
-		else 
-			ucIdLinkStatus &= ~ 0x08;
-		
-		if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+CIPSTATUS:4," ) )
-			ucIdLinkStatus |= 0x10;
-		else 
-			ucIdLinkStatus &= ~ 0x10;	
-
+		else if( strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "STATUS:5" ) )
+			ucIdLinkStatus = AP_Disconnect;
 	}
 	
 	return ucIdLinkStatus;
 	
 }
 
-
+uint8_t ESP8266_Get_Connect_AP_Status(void)
+{
+	return ESP8266_Cmd( "AT+CIPSTATUS", "OK", "STATUS:2", 500 );
+}
 /*
  * 函数名：ESP8266_Inquire_ApIp
  * 描述  ：获取 F-ESP8266 的 AP IP
@@ -720,7 +727,7 @@ uint8_t ESP8266_SmartConfig(void)
 	if(!ESP8266_Cmd( "AT+CWSTARTSMART=3", "OK", 0, 2000 ))
 	{
 		ESP8266_RxBufClear();
-		if(ESP8266_ReceiveStatusString("smartconfig connected wifi",0,60000) == 0)
+		if(ESP8266_ReceiveStatusString("smartconfig connected wifi",60000) == 0)
 			result = 0;
 		else
 			result = 2;
@@ -730,67 +737,83 @@ uint8_t ESP8266_SmartConfig(void)
 	return result;	
 }
 
-void ESP8266_UnvarnishReceive(void)
+char* ESP8266_Receive(FunctionalState enumEnUnvarnishTx, uint32_t timeout)
 {
-	uint32_t length;
-	if(strEsp8266_Fram_Record.InfBit.FramLength == 0)
-		return;
-	else
+	uint32_t length = 0;
+	char * p, *lp;
+	uint32_t data_len;
+	char *result = NULL;
+	uint32_t check_cnt,check_time = 50;
+	check_cnt = timeout/check_time;
+	
+	while(check_cnt--)
 	{
-		length = strEsp8266_Fram_Record.InfBit.FramLength;
-		Delay_ms( 50 );
-		while(length != strEsp8266_Fram_Record.InfBit.FramLength)
+		Delay_ms( check_time );
+		if(strEsp8266_Fram_Record.InfBit.FramLength == 0)
+			continue;
+		else if((strEsp8266_Fram_Record.InfBit.FramLength != 0)&&((length == 0)||(strEsp8266_Fram_Record.InfBit.FramLength != length)))
 		{
-			Delay_ms( 50 );
+			length = strEsp8266_Fram_Record.InfBit.FramLength;
+			continue;
 		}
-		
-		//处理透传协议数据
-		macPC_Usart("%s", strEsp8266_Fram_Record.Data_RX_BUF);
-		ESP8266_RxBufClear();
+		else
+		{
+			if(enumEnUnvarnishTx == DISABLE)
+			{
+				p = strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+IPD," );
+				if(p != NULL)
+				{
+					p = p + 5;
+					lp = strstr((char*)p, ":" );
+					if(lp != NULL)
+					{
+						data_len = Asc2Dec((uint8_t*)p,lp-p);
+						*(lp+1+data_len) = 0;
+						result = lp+1;
+					}
+				}
+			}
+			else
+				result = (char *)strEsp8266_Fram_Record.Data_RX_BUF;
+			//处理透传协议数据
+			macPC_Usart("%s", strEsp8266_Fram_Record.Data_RX_BUF);
+	//		ESP8266_RxBufClear();
+			
+		}
 	}
-
+	return result;
 }
 
 /*
 */
 
-uint8_t ESP8266_ReceiveStatusString(char * string1, char * string2, uint32_t timeout)
+uint8_t ESP8266_ReceiveStatusString(char * string1, uint32_t timeout)
 {
-	uint32_t i;
+	uint32_t i,length;
 	uint8_t result = 2;
-//	uint32_t check_cnt,check_time = 50;
+	uint32_t check_cnt,check_time = 50;
+	check_cnt = timeout/check_time;
 	
-//	check_cnt = timeout/check_time;
-	Delay_ms( timeout );                 //延时
-	for(i=0; i<sizeof(strEsp8266_Fram_Record.Data_RX_BUF)-3;i++)
+	while(check_cnt--)
 	{
-		if(strEsp8266_Fram_Record.Data_RX_BUF[i] == 0x00)
-			strEsp8266_Fram_Record.Data_RX_BUF[i] = 0x01;
-	}
-//	while(check_cnt--)
-//	{
-//		Delay_ms( check_time );                 //延时
-		if((string1 != 0) && ( string2 != 0))
+		Delay_ms( check_time );
+		if(string1 != 0)
 		{
-			if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, string1)) 
+			if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, string1))
+			{
 				result = 0;
-			else if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, string2))
-				result = 1;
+				break;
+			}
 			else
 				result = 2;
 		}
-		else if((string1 != 0))
-			if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, string1))
-				result = 0;
-			else
-				result = 2;
-		else 
-			if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, string2))
-				result = 0;
-			else
-				result = 2;
-//	}
-	macPC_Usart("%s", strEsp8266_Fram_Record.Data_RX_BUF);
+		else
+		{
+			result = 0;
+			break;
+		}
+		
+	}
 	ESP8266_RxBufClear();
 	return result;
 }
