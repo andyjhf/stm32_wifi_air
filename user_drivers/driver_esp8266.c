@@ -207,9 +207,9 @@ void ESP8266_Rst( void )
 	 macESP8266_RST_LOW_LEVEL();
 	 Delay_ms( 1000 ); 
 	 macESP8266_RST_HIGH_LEVEL();
-	macESP8266_CH_DISABLE();
-	Delay_ms( 120000 );
-	macESP8266_CH_ENABLE();
+//	macESP8266_CH_DISABLE();
+//	Delay_ms( 120000 );
+//	macESP8266_CH_ENABLE();
 	#endif
 
 }
@@ -261,21 +261,31 @@ uint8_t ESP8266_Cmd( char * cmd, char * reply1, char * reply2, uint32_t waittime
 	//		}
 			strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength] = 0;
 			if((reply1 != 0) && ( reply2 != 0))
+			{
 				if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply1) 
 					&& strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply2))
 					result = 0;
 				else
+				{
 					result = 1;
+					continue;
+				}
+			}
 			else if((reply1 != 0))
+			{
 				if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply1))
 					result = 0;
 				else
 					result = 1;
+			}
 			else 
+			{
 				if(strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, reply2))
 					result = 0;
 				else
 					result = 1;
+			}
+			break;
 		}
 	}
 	strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength] = 0;
@@ -458,7 +468,7 @@ uint8_t ESP8266_Link_Server( ENUM_NetPro_TypeDef enumE, char * ip, char * ComNum
   else
 	  sprintf( cCmd, "AT+CIPSTART=%s", cStr );
 
-	return ESP8266_Cmd( cCmd, "OK", 0, 5000 );
+	return ESP8266_Cmd( cCmd, "CONNECT", "OK", 5000 );
 	
 }
 
@@ -639,7 +649,8 @@ void ESP8266_ExitUnvarnishSend( void )
 {
 	Delay_ms( 1000 );
 	
-	macESP8266_Usart( "+++" );
+	macESP8266_Usart("+++");
+	macPC_Usart("+++\r\n");
 	
 	Delay_ms( 500 ); 
 	
@@ -724,7 +735,7 @@ uint8_t* ESP8266_ReceiveString( FunctionalState enumEnUnvarnishTx )
 uint8_t ESP8266_SmartConfig(void)
 {
 	uint8_t result = 1;
-	if(!ESP8266_Cmd( "AT+CWSTARTSMART=3", "OK", 0, 2000 ))
+	if(!ESP8266_Cmd( "AT+CWSTARTSMART=3", "OK", 0, 5000 ))
 	{
 		ESP8266_RxBufClear();
 		if(ESP8266_ReceiveStatusString("smartconfig connected wifi",60000) == 0)
@@ -758,6 +769,7 @@ char* ESP8266_Receive(FunctionalState enumEnUnvarnishTx, uint32_t timeout)
 		}
 		else
 		{
+			strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength] = 0;
 			if(enumEnUnvarnishTx == DISABLE)
 			{
 				p = strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "+IPD," );
@@ -777,7 +789,7 @@ char* ESP8266_Receive(FunctionalState enumEnUnvarnishTx, uint32_t timeout)
 				result = (char *)strEsp8266_Fram_Record.Data_RX_BUF;
 			//处理透传协议数据
 			macPC_Usart("%s", strEsp8266_Fram_Record.Data_RX_BUF);
-	//		ESP8266_RxBufClear();
+			break;
 			
 		}
 	}
@@ -789,7 +801,6 @@ char* ESP8266_Receive(FunctionalState enumEnUnvarnishTx, uint32_t timeout)
 
 uint8_t ESP8266_ReceiveStatusString(char * string1, uint32_t timeout)
 {
-	uint32_t i,length;
 	uint8_t result = 2;
 	uint32_t check_cnt,check_time = 50;
 	check_cnt = timeout/check_time;
@@ -814,6 +825,7 @@ uint8_t ESP8266_ReceiveStatusString(char * string1, uint32_t timeout)
 		}
 		
 	}
+	macPC_Usart("%s\r\n", strEsp8266_Fram_Record.Data_RX_BUF);
 	ESP8266_RxBufClear();
 	return result;
 }

@@ -96,7 +96,7 @@ int main(void)
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 	XTaskEsp8266_Init();
-//	CXTaskComERV_InitTask();
+	CXTaskComERV_InitTask();
 	
 	osKernelStart();
   /* USER CODE BEGIN 2 */

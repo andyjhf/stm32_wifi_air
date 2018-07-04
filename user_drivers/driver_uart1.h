@@ -7,7 +7,7 @@
 
 #include "driver_utility.h"
 
-#define BUF_SIZE 255
+#define BUF_SIZE 128
 
 // RS-485 half-duplex
 typedef enum 

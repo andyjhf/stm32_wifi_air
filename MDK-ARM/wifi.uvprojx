@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Drivers\STM32F1xx_HAL_Driver\Inc;..\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;..\Drivers\CMSIS\Include;..\Drivers\CMSIS\Device\ST\STM32F1xx\Include;..\user_drivers;..\XApp;..\Middlewares\Third_Party\FreeRTOS\Source\include;..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>..\Drivers\STM32F1xx_HAL_Driver\Inc;..\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;..\Drivers\CMSIS\Include;..\Drivers\CMSIS\Device\ST\STM32F1xx\Include;..\user_drivers;..\XApp;..\Middlewares\Third_Party\FreeRTOS\Source\include;..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM3;..\cJson</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -622,10 +622,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>::CMSIS</GroupName>
+          <GroupName>cJson</GroupName>
+          <Files>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cJson\cJSON.c</FilePath>
+            </File>
+            <File>
+              <FileName>cJSON_Utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cJson\cJSON_Utils.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
-          <GroupName>::Data Exchange</GroupName>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -640,21 +652,13 @@
           <targetInfo name="wifi"/>
         </targetInfos>
       </component>
-      <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC">
-        <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
-        <targetInfos>
-          <targetInfo name="wifi"/>
-        </targetInfos>
-      </component>
     </components>
     <files>
       <file attr="config" category="source" name="src\jansson_config.c" version="2.7.0">
-        <instance index="0">RTE\Data_Exchange\jansson_config.c</instance>
+        <instance index="0" removed="1">RTE\Data_Exchange\jansson_config.c</instance>
         <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC"/>
         <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
-        <targetInfos>
-          <targetInfo name="wifi"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
     </files>
   </RTE>
