@@ -40,40 +40,6 @@
 #include "main.h"
 //#include "cmsis_os.h"
 #include "XApp.h"
-//#include "stm32f1xx_hal.h"
-//#include "driver_gpio.h"
-//#include "driver_rcc.h"
-#include "driver_uart1.h"
-#include "driver_uart2.h"
-
-
-osThreadId defaultTaskHandle;
-
-//uint32_t led_blinkcnt = 0;
-//uint32_t led_blinktime = 1000;
-//static void LED_blink(uint16_t tmOnce)
-//{
-//	if(led_blinkcnt > led_blinktime)
-//	{
-//		LED_Toggle(LED1);
-//		led_blinkcnt = 0;
-//	}
-//	led_blinkcnt++;
-
-//}
-
-void StartDefaultTask(void const * argument)
-{
-
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-		LED_Toggle(LED1);
-    osDelay(1000);
-  }
-  /* USER CODE END 5 */ 
-}
 
 /**
   * @brief  The application entry point.
@@ -88,13 +54,15 @@ int main(void)
   GPIO_CLK_Init();
 	USART2_Init();
 	LED_Init(LED1);
+	LED_Init(LED2);
+	LED_On(LED2);
 	SWI_Init(SW1_1);
 	if(!SWI_GetState(SW1_1))
 		g_SmartConfig = 1;
 	printf("system init\r\n");
 	USART1_Init();
-	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	IWDG_Init();
+	CXTaskHost_InitTask();
 	XTaskEsp8266_Init();
 	CXTaskComERV_InitTask();
 	

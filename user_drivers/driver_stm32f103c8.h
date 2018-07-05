@@ -61,8 +61,8 @@ typedef enum
 #define LED1_PIN                   GPIO_PIN_13             // LED-1
 #define LED1_PORT                  GPIOC
 //#define LED1_CLK                   RCC_AHB1ENR_GPIOBEN
-#define LED2_PIN                   GPIO_PIN_14             // LED-3
-#define LED2_PORT                  GPIOB
+#define LED2_PIN                   GPIO_PIN_5             // LED-3
+#define LED2_PORT                  GPIOA
 //#define LED2_CLK                   RCC_AHB1ENR_GPIOBEN
 
 /* WIFI define-------------------------------------------------------------*/

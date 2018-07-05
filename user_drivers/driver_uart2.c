@@ -55,7 +55,7 @@ void USART2_Init(void)
 
 
 	// Enable USART1_IRQn
-	HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
+	HAL_NVIC_SetPriority(USART2_IRQn, 0, 2);
 	HAL_NVIC_EnableIRQ(USART2_IRQn);
 
 	// Enable USART1

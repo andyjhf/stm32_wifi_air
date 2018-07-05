@@ -33,6 +33,7 @@ void StartXTaskAirModule(void const * argument)
   {
 		MSerial_DoLoop(TIMEOUT_LOOP);
 		osDelay(TIMEOUT_LOOP);
+		IWDG_Feed();
 	}
 
 }
@@ -45,7 +46,7 @@ void CXTaskComERV_InitTask(void)
 
 	m_errCnt  = 0;
 
-	osThreadDef(XTaskAirModule, StartXTaskAirModule, osPriorityBelowNormal, 0, 128);
+	osThreadDef(XTaskAirModule, StartXTaskAirModule, osPriorityAboveNormal, 0, 128);
   XTaskAirModuleHandle = osThreadCreate(osThread(XTaskAirModule), NULL);
 }
 
@@ -73,12 +74,13 @@ U16 OnNewRecv(void)
 	uint8_t* p = m_rxBuf;
 	if (1==checkFrame())                           // 1.check frame(length,header/tail,CRC)
 	{
+		g_airmoduleState = 0;
 		onError();
 		return 0;
 	}
 	m_errCnt = *p;
 	m_errCnt = 0;
-
+	g_airmoduleState = 1;
 	if(m_sendCmd == CMD_AIR_READ_ALL_DATA)
 	{
 		g_AirPM1_0    = (m_rxBuf[INDEX_AIR_PM1_0]<<8) | m_rxBuf[INDEX_AIR_PM1_0+1];
@@ -126,11 +128,6 @@ static U8 checkFrame(void)
 		printf("timeout\r\n");
 		return 1;
 	}
-	for(i=0;i<m_rxLen;i++)
-	{
-//		printf("%02x ",m_rxBuf[i]);
-	}
-//	printf("\r\n");
 	if((CHARACTER_BYTE0 != m_rxBuf[0])&&(CHARACTER_BYTE1 != m_rxBuf[1]))
 	{
 		printf("header error\r\n");
@@ -154,11 +151,11 @@ static void onError(void)
 
 	if(0==m_rxLen)
 	{
-		g_rs485 = 1;
+	//	g_rs485 = 1;
 	}
 	else
 	{
-		g_rs485 = 0;
+//		g_rs485 = 0;
 	}
 	
 	// determine the error kind after 30 secs(A/B wires reversed or A/B wires are open)

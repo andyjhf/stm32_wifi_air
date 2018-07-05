@@ -4,9 +4,9 @@
 #include "driver_gpio.h"
 #include "driver_rcc.h"
 #include "driver_uart1.h"
-//#include "driver_uart2.h"
+#include "driver_uart2.h"
 #include "driver_esp8266.h"
-//#include "driver_iwdg.h"
+#include "driver_iwdg.h"
 //#include "driver_i2c1.h"
 /*
 #include "ayla_conf_access.h"
@@ -18,7 +18,7 @@
 #include "ayla_uart.h"
 */
 #include "MUtility.h"
-//#include "XTaskHost.h"
+#include "XTaskHost.h"
 #include "XTaskComERV.h"
 #include "XTaskEsp8266.h"
 

@@ -12,6 +12,8 @@ static uint8_t m_linked_server = 0;
 static uint8_t m_disconnect_server = 0;
 static uint8_t m_send_togle = 1;
 
+static uint8_t m_link_cnt = 0;
+
 static uint8_t m_send_get = 1;
 static uint8_t m_send_time = 0;
 static uint8_t m_error_cnt = 0;
@@ -48,6 +50,7 @@ void StartXTaskEsp8266(void const * argument)
 				m_state = 1;
 				m_error_cnt = 0;
 				m_Dis_Link_cnt = 0;
+				g_wifiReady = 1;
 				osDelay(1000);
 			break;
 			case TCP_UDP_Connect:
@@ -57,6 +60,7 @@ void StartXTaskEsp8266(void const * argument)
 				m_state = 1;
 				m_error_cnt = 0;
 				m_Dis_Link_cnt = 0;
+				g_wifiReady = 1;
 				osDelay(1000);
 			break;
 			case TCP_UDP_Disconnect:
@@ -66,22 +70,25 @@ void StartXTaskEsp8266(void const * argument)
 				m_state = 1;
 				m_error_cnt = 0;
 				m_Dis_Link_cnt = 0;
+				g_wifiReady = 1;
 				osDelay(1000);
 			break;
 			case AP_Disconnect:
 				m_linked_ap = 0;
 				m_linked_server = 0;
 				
-				m_Dis_Link_cnt++;
-				if(m_Dis_Link_cnt > 10)
-				{
-					m_Dis_Link_cnt = 0;
-					printf("=====reset wifi module\r\n");
-					ESP8266_Rst();
-					osDelay(15000);
-				}
+//				m_Dis_Link_cnt++;
+//				if(m_Dis_Link_cnt > 10)
+//				{
+//					m_Dis_Link_cnt = 0;
+//					printf("=====reset wifi module\r\n");
+//					ESP8266_Rst();
+//					osDelay(15000);
+//				}
 				m_state = 1;
 				m_error_cnt = 0;
+				g_wifiReady = 0;
+				g_wifiLink = 0;
 				osDelay(1000);
 			break;
 			default:
@@ -89,6 +96,8 @@ void StartXTaskEsp8266(void const * argument)
 				m_linked_server = 0;
 				m_state = 0;
 				m_error_cnt++;
+				g_wifiReady = 0;
+				g_wifiLink = 0;
 				if(m_error_cnt>5)
 				{
 					m_error_cnt = 0;
@@ -149,6 +158,8 @@ void StartXTaskEsp8266(void const * argument)
 						&& !ESP8266_Link_Server(enumTCP, macUser_ESP8266_TcpServer_IP, macUser_ESP8266_TcpServer_Port, Single_ID_0)
 						&& !ESP8266_UnvarnishSend())
 					{
+						m_link_cnt = 0;
+						g_wifiLink = 1;
 						m_linked_server = 1;
 						printf("link to server\r\n");
 					}
@@ -212,6 +223,12 @@ void StartXTaskEsp8266(void const * argument)
 		{
 			m_send_time = 0;
 			m_send_get = 1;
+			m_link_cnt++;
+		}
+		if(m_link_cnt > 5)
+		{
+			m_link_cnt = 0;
+			g_wifiLink = 0;
 		}
     osDelay(3000);
   }
@@ -221,7 +238,7 @@ void StartXTaskEsp8266(void const * argument)
 void XTaskEsp8266_Init(void)
 {
 	ESP8266_Init();
-	osThreadDef(XTaskEsp8266, StartXTaskEsp8266, osPriorityNormal, 0, 1024);
+	osThreadDef(XTaskEsp8266, StartXTaskEsp8266, osPriorityHigh, 0, 1024);
   XTaskEsp8266Handle = osThreadCreate(osThread(XTaskEsp8266), NULL);
 
 }
