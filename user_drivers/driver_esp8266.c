@@ -9,7 +9,7 @@ static void                   ESP8266_GPIO_Config                ( void );
 static void                   ESP8266_USART_Config               ( void );
 //static void                   ESP8266_USART_NVIC_Configuration   ( void );
 volatile uint8_t ucTcpClosedFlag = 0;
-UART_HandleTypeDef huart3;
+UART_HandleTypeDef huart2;
 /*********************************************** ESP8266 函数宏定义 *******************************************/
 
 //#define     macPC_Usart( fmt, ... )                
@@ -20,10 +20,10 @@ UART_HandleTypeDef huart3;
 #define     macESP8266_RST_HIGH_LEVEL()            HAL_GPIO_WritePin(macESP8266_RST_PORT, macESP8266_RST_PIN, GPIO_PIN_SET)
 #define     macESP8266_RST_LOW_LEVEL()             HAL_GPIO_WritePin(macESP8266_RST_PORT, macESP8266_RST_PIN, GPIO_PIN_RESET)
 
-#define     macESP8266_Usart( fmt, ... )           USART_printf(&huart3, fmt, ##__VA_ARGS__ ) 
+#define     macESP8266_Usart( fmt, ... )           USART_printf(&huart2, fmt, ##__VA_ARGS__ ) 
 #define     macPC_Usart( fmt, ... )                printf( fmt, ##__VA_ARGS__ )
 
-#define     macESP8266_USART_INT_FUN              USART3_IRQHandler
+#define     macESP8266_USART_INT_FUN              USART2_IRQHandler
 
 struct  STRUCT_USARTx_Fram strEsp8266_Fram_Record = { 0 };
 
@@ -81,7 +81,7 @@ static void ESP8266_USART_Config( void )
 	
 
 	/* Peripheral clock enable */
-	__HAL_RCC_USART3_CLK_ENABLE();
+	__HAL_RCC_USART2_CLK_ENABLE();
 
 	/**USART1 GPIO Configuration    
 	PA9     ------> USART1_TX
@@ -97,15 +97,15 @@ static void ESP8266_USART_Config( void )
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(macESP8266_USART_RX_PORT, &GPIO_InitStruct);
 	
-	huart3.Instance = macESP8266_USARTx;
-  huart3.Init.BaudRate = macESP8266_USART_BAUD_RATE;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if(HAL_UART_Init(&huart3) != HAL_OK)
+	huart2.Instance = macESP8266_USARTx;
+  huart2.Init.BaudRate = macESP8266_USART_BAUD_RATE;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if(HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -115,57 +115,57 @@ static void ESP8266_USART_Config( void )
 	HAL_NVIC_SetPriority(macESP8266_USART_IRQ, 0, 0);
 	HAL_NVIC_EnableIRQ(macESP8266_USART_IRQ);
 
-	__HAL_UART_ENABLE_IT(&huart3,UART_IT_RXNE);
-	__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);
-	__HAL_UART_ENABLE(&huart3);
+	__HAL_UART_ENABLE_IT(&huart2,UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(&huart2,UART_IT_IDLE);
+	__HAL_UART_ENABLE(&huart2);
 }
 
 void macESP8266_USART_INT_FUN( void )
 {	
 	uint8_t ucCh;
 //	
-//	if( __HAL_UART_GET_IT_SOURCE(&huart3, UART_IT_RXNE) & USART_CR1_RXNEIE)
+//	if( __HAL_UART_GET_IT_SOURCE(&huart2, UART_IT_RXNE) & USART_CR1_RXNEIE)
 //	{
-//		ucCh  = (uint8_t)(huart3.Instance->DR &(uint8_t)0x00FF);
+//		ucCh  = (uint8_t)(huart2.Instance->DR &(uint8_t)0x00FF);
 //		
 //		if( strEsp8266_Fram_Record.InfBit.FramLength > ( RX_BUF_MAX_LEN - 1 ) )                      //预留1个字节写结束符
 //			strEsp8266_Fram_Record.InfBit.FramLength = 0;
 //		strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength++]  = ucCh;
 //	}
 //	 	 
-//	if( __HAL_UART_GET_IT_SOURCE(&huart3, UART_IT_IDLE) & USART_CR1_IDLEIE)                                         //数据帧接收完毕
+//	if( __HAL_UART_GET_IT_SOURCE(&huart2, UART_IT_IDLE) & USART_CR1_IDLEIE)                                         //数据帧接收完毕
 //	{
 //    strEsp8266_Fram_Record.InfBit.FramFinishFlag = 1;
 //		
-//		ucCh = (uint16_t)(huart3.Instance->DR & (uint16_t)0x01FF);                                                           //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+//		ucCh = (uint16_t)(huart2.Instance->DR & (uint16_t)0x01FF);                                                           //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
 //	
 //		ucTcpClosedFlag = strstr((char*)strEsp8266_Fram_Record.Data_RX_BUF, "CLOSED\r\n" ) ? 1 : 0;
 //		
 //  }	
 	
 	// Received completed interrupt(RXNE) if RXNEIE=1 in the USARTx_CR1 register
-	if((huart3.Instance->SR & USART_SR_RXNE) && (huart3.Instance->CR1&USART_CR1_RXNEIE ))
+	if((huart2.Instance->SR & USART_SR_RXNE) && (huart2.Instance->CR1&USART_CR1_RXNEIE ))
 	{
-		ucCh  = (uint8_t)(huart3.Instance->DR &(uint8_t)0x00FF);
+		ucCh  = (uint8_t)(huart2.Instance->DR &(uint8_t)0x00FF);
 		
 		if( strEsp8266_Fram_Record.InfBit.FramLength > ( RX_BUF_MAX_LEN - 1 ) )                      //预留1个字节写结束符
 			strEsp8266_Fram_Record.InfBit.FramLength = 0;
 		strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength++]  = ucCh;
 	}
-//	else if((huart3.Instance->SR & USART_SR_IDLE) && (huart3.Instance->CR1&USART_CR1_IDLEIE ))
+//	else if((huart2.Instance->SR & USART_SR_IDLE) && (huart2.Instance->CR1&USART_CR1_IDLEIE ))
 //	{
 		
 //	}
 	// Transmit completed interrupt(TC) if TCIE=1 in the USARTx_CR1 register
 	else
 	{
-		ucCh  = (uint8_t)(huart3.Instance->DR &(uint8_t)0x00FF);
+		ucCh  = (uint8_t)(huart2.Instance->DR &(uint8_t)0x00FF);
 	}
 	
 	
-//	uint32_t isrflags   = READ_REG(huart3.Instance->SR);
-//	uint32_t cr1its     = READ_REG(huart3.Instance->CR1);
-//	uint32_t cr3its     = READ_REG(huart3.Instance->CR3);
+//	uint32_t isrflags   = READ_REG(huart2.Instance->SR);
+//	uint32_t cr1its     = READ_REG(huart2.Instance->CR1);
+//	uint32_t cr3its     = READ_REG(huart2.Instance->CR3);
 //	uint32_t errorflags = 0x00U;
 ////	uint32_t dmarequest = 0x00U;
 
@@ -178,7 +178,7 @@ void macESP8266_USART_INT_FUN( void )
 //    {
 //			if(strEsp8266_Fram_Record.InfBit.FramLength >= RX_BUF_MAX_LEN)
 //				strEsp8266_Fram_Record.InfBit.FramLength = 0;
-//      strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength++] = (uint8_t)(huart3.Instance->DR & (uint8_t)0x00FF);
+//      strEsp8266_Fram_Record.Data_RX_BUF[strEsp8266_Fram_Record.InfBit.FramLength++] = (uint8_t)(huart2.Instance->DR & (uint8_t)0x00FF);
 //      return;
 //    }
 //  }

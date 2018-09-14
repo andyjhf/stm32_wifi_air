@@ -8,145 +8,145 @@
  
 #include "driver_uart1.h"
 
-USART_DATA	g_usart1;
+USART_DATA	g_usart3;
 
-void USART1_IRQHandler(void)
+void USART3_IRQHandler(void)
 {
 	// Received completed interrupt(RXNE) if RXNEIE=1 in the USARTx_CR1 register
-	if((USART1->SR & USART_SR_RXNE) && (USART1->CR1&USART_CR1_RXNEIE ))
+	if((USART3->SR & USART_SR_RXNE) && (USART3->CR1&USART_CR1_RXNEIE ))
 	{
 		// Auto cleared by a read to the DR
-		g_usart1.rxBuff[g_usart1.rxEnd++] = USART1->DR;
+		g_usart3.rxBuff[g_usart3.rxEnd++] = USART3->DR;
 	}
 	// Transmit completed interrupt(TC) if TCIE=1 in the USARTx_CR1 register
-	else if((USART1->SR & USART_SR_TC) && (USART1->CR1 & USART_CR1_TCIE))
+	else if((USART3->SR & USART_SR_TC) && (USART3->CR1 & USART_CR1_TCIE))
 	{
-		if(g_usart1.txStart!=g_usart1.txEnd)
+		if(g_usart3.txStart!=g_usart3.txEnd)
 		{
 			// Auto cleared by a write to the DR
-			USART1->DR= g_usart1.txBuff[g_usart1.txStart++];
+			USART3->DR= g_usart3.txBuff[g_usart3.txStart++];
 		}
 		else
 		{
-			USART1_PreReceive();
+			USART3_PreReceive();
 		}
 	}
 	else
 	{
 		// Note: STM32F411 can be cleared by a read to the DR
-		g_usart1.rxBuff[g_usart1.rxEnd++] = USART1->DR;
+		g_usart3.rxBuff[g_usart3.rxEnd++] = USART3->DR;
 	}
 }
 
-void USART1_Init(void)
+void USART3_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
-	UART_HandleTypeDef huart1;
+	UART_HandleTypeDef huart3;
 
 	/* Peripheral clock enable */
-	__HAL_RCC_USART1_CLK_ENABLE();
+	__HAL_RCC_USART3_CLK_ENABLE();
 
-	/**USART1 GPIO Configuration    
-	PA9     ------> USART1_TX
-	PA10     ------> USART1_RX 
+	/**USART3 GPIO Configuration    
+	PB10     ------> USART3_TX
+	PB11     ------> USART3_RX 
 	*/
-	GPIO_InitStruct.Pin = GPIO_PIN_9;
+	GPIO_InitStruct.Pin = GPIO_PIN_10;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	GPIO_InitStruct.Pin = GPIO_PIN_10;
+	GPIO_InitStruct.Pin = GPIO_PIN_11;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
-	huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+	huart3.Instance = USART3;
+  huart3.Init.BaudRate = 9600;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
   {
     Error_Handler();
   }
 
 
-	// Enable USART1_IRQn
-	HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
-	HAL_NVIC_EnableIRQ(USART1_IRQn);
+	// Enable USART3_IRQn
+	HAL_NVIC_SetPriority(USART3_IRQn, 0, 1);
+	HAL_NVIC_EnableIRQ(USART3_IRQn);
 
-	// Set USART1 receive state
-	__HAL_UART_ENABLE_IT(&huart1,UART_IT_RXNE);
-	__HAL_UART_ENABLE_IT(&huart1,UART_IT_TC);
-//	USART1_PreTransmit();
+	// Set USART3 receive state
+	__HAL_UART_ENABLE_IT(&huart3,UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(&huart3,UART_IT_TC);
+//	USART3_PreTransmit();
 
-	// Enable USART1
-	__HAL_UART_ENABLE(&huart1);
+	// Enable USART3
+	__HAL_UART_ENABLE(&huart3);
 }
 
-void USART1_OffReceive(void)
+void USART3_OffReceive(void)
 {
-	USART1->CR1 &= ~USART_CR1_RE;                  // Receiver disable
+	USART3->CR1 &= ~USART_CR1_RE;                  // Receiver disable
 }
 
-void USART1_PreReceive(void)
+void USART3_PreReceive(void)
 {
 	// note: STM32F411 can be cleared by writing a '0'
-	USART1->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
-//	USART1->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
-//	USART1->CR1 &= ~USART_CR1_TCIE;                // disable TC interrupt
-//	USART1->CR1 |= USART_CR1_RXNEIE;               // enable RXNE interrupt
-//	USART1->CR1 |= USART_CR1_RE;                   // Receiver Enable
+	USART3->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
+//	USART3->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
+//	USART3->CR1 &= ~USART_CR1_TCIE;                // disable TC interrupt
+//	USART3->CR1 |= USART_CR1_RXNEIE;               // enable RXNE interrupt
+//	USART3->CR1 |= USART_CR1_RE;                   // Receiver Enable
 
-	g_usart1.rxStart= 0;                           // clear buffer and set receive state
-	g_usart1.rxEnd  = 0;
+	g_usart3.rxStart= 0;                           // clear buffer and set receive state
+	g_usart3.rxEnd  = 0;
 //	RS485_DE_PORT->BSRRH = RS485_DE_PIN;           // reset receive status(0) of RS485 chip
-	g_usart1.status = USART_RX;                    // set usart state for receving
+	g_usart3.status = USART_RX;                    // set usart state for receving
 }
 
-void USART1_PreTransmit(void)
+void USART3_PreTransmit(void)
 {
-//	USART1->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
-	USART1->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
-//	USART1->CR1 &= ~USART_CR1_RXNEIE;              // disable RXNE interrupt
-//	USART1->CR1 |= USART_CR1_TCIE;                 // enable TC interrupt
-//	USART1->CR1 &= ~USART_CR1_RE;                  // Receiver disable
+//	USART3->SR &=  ~USART_SR_TC;                   // clear TC interrupt flag
+	USART3->SR &=  ~USART_SR_RXNE;                 // clear RXNE interrupt flag
+//	USART3->CR1 &= ~USART_CR1_RXNEIE;              // disable RXNE interrupt
+//	USART3->CR1 |= USART_CR1_TCIE;                 // enable TC interrupt
+//	USART3->CR1 &= ~USART_CR1_RE;                  // Receiver disable
 
 //	RS485_DE_PORT->BSRRL = RS485_DE_PIN;           // set transmit status(1) of RS485 chip
-	g_usart1.txStart  = 0;                         // clear buffer and set transmit state
-	g_usart1.txEnd    = 0;                         // note: do not clear end 
-	g_usart1.status = USART_TX;                    // set usart state for transmitting
+	g_usart3.txStart  = 0;                         // clear buffer and set transmit state
+	g_usart3.txEnd    = 0;                         // note: do not clear end 
+	g_usart3.status = USART_TX;                    // set usart state for transmitting
 }
 
-void USART1_StartSend(void)
+void USART3_StartSend(void)
 {
 	// Transmit first data to DR
-	USART1->DR = g_usart1.txBuff[g_usart1.txStart++];
+	USART3->DR = g_usart3.txBuff[g_usart3.txStart++];
 }
 
-uint8_t USART1_GetByte(uint8_t* pData)
+uint8_t USART3_GetByte(uint8_t* pData)
 {
 	uint8_t size=0;
-	if(g_usart1.rxStart != g_usart1.rxEnd)
+	if(g_usart3.rxStart != g_usart3.rxEnd)
 	{
-		pData[size++] = g_usart1.rxBuff[g_usart1.rxStart++];
+		pData[size++] = g_usart3.rxBuff[g_usart3.rxStart++];
 	}
 	return size;
 }
 
-uint8_t USART1_Write(uint8_t* pData, uint8_t len)
+uint8_t USART3_Write(uint8_t* pData, uint8_t len)
 {
 	while(len--)
 	{
-		g_usart1.txBuff[g_usart1.txEnd++] = *pData++;
+		g_usart3.txBuff[g_usart3.txEnd++] = *pData++;
 	}
-	return g_usart1.txEnd;
+	return g_usart3.txEnd;
 }
 
-uint8_t USART1_GetStatus(void)
+uint8_t USART3_GetStatus(void)
 {
-	return g_usart1.status;
+	return g_usart3.status;
 }

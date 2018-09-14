@@ -37,8 +37,8 @@ typedef enum
 */
 /* SWI define ------------------------------------------------------------*/
 #define SWIn                       2
-#define SWI1_PIN                   GPIO_PIN_13             // SW1-1
-#define SWI1_PORT                  GPIOB
+#define SWI1_PIN                   GPIO_PIN_6             // SW1-1
+#define SWI1_PORT                  GPIOA
 //#define SWI1_CLK                   RCC_AHB1ENR_GPIOBEN
 #define SWI2_PIN                   GPIO_PIN_14             // SW1-2
 #define SWI2_PORT                  GPIOB
@@ -58,47 +58,47 @@ typedef enum
 */
 /* LED define ------------------------------------------------------------*/
 #define LEDn                       2
-#define LED1_PIN                   GPIO_PIN_13             // LED-1
-#define LED1_PORT                  GPIOC
+#define LED1_PIN                   GPIO_PIN_6             // LED-1
+#define LED1_PORT                  GPIOB
 //#define LED1_CLK                   RCC_AHB1ENR_GPIOBEN
-#define LED2_PIN                   GPIO_PIN_5             // LED-3
-#define LED2_PORT                  GPIOA
+#define LED2_PIN                   GPIO_PIN_7             // LED-3
+#define LED2_PORT                  GPIOB
 //#define LED2_CLK                   RCC_AHB1ENR_GPIOBEN
 
 /* WIFI define-------------------------------------------------------------*/
 /******************************** ESP8266 连接引脚定义 ***********************************/ 
-#define      macESP8266_CH_PD_PORT                            GPIOB
-#define      macESP8266_CH_PD_PIN                             GPIO_PIN_15
+#define      macESP8266_CH_PD_PORT                            GPIOA
+#define      macESP8266_CH_PD_PIN                             GPIO_PIN_5
 
-#define      macESP8266_RST_PORT                              GPIOB
-#define      macESP8266_RST_PIN                               GPIO_PIN_12
+#define      macESP8266_RST_PORT                              GPIOA
+#define      macESP8266_RST_PIN                               GPIO_PIN_1
 
  
 
 #define      macESP8266_USART_BAUD_RATE                       115200
 
-#define      macESP8266_USARTx                                USART3
+#define      macESP8266_USARTx                                USART2
 #define      macESP8266_USART_APBxClock_FUN                   RCC_APB1PeriphClockCmd
-#define      macESP8266_USART_CLK                             RCC_APB1Periph_USART3
+#define      macESP8266_USART_CLK                             RCC_APB1Periph_USART2
 #define      macESP8266_USART_GPIO_APBxClock_FUN              RCC_APB2PeriphClockCmd
-#define      macESP8266_USART_GPIO_CLK                        RCC_APB2Periph_GPIOB     
-#define      macESP8266_USART_TX_PORT                         GPIOB   
-#define      macESP8266_USART_TX_PIN                          GPIO_PIN_10
-#define      macESP8266_USART_RX_PORT                         GPIOB
-#define      macESP8266_USART_RX_PIN                          GPIO_PIN_11
-#define      macESP8266_USART_IRQ                             USART3_IRQn
-#define      macESP8266_USART_INT_FUN                         USART3_IRQHandler
+#define      macESP8266_USART_GPIO_CLK                        RCC_APB2Periph_GPIOA     
+#define      macESP8266_USART_TX_PORT                         GPIOA   
+#define      macESP8266_USART_TX_PIN                          GPIO_PIN_2
+#define      macESP8266_USART_RX_PORT                         GPIOA
+#define      macESP8266_USART_RX_PIN                          GPIO_PIN_3
+#define      macESP8266_USART_IRQ                             USART2_IRQn
+#define      macESP8266_USART_INT_FUN                         USART2_IRQHandler
 /* USART2 define ----------------------------------------------------------*/
 /**************************USART参数定义********************************/
 #define             macUSART_BAUD_RATE                       115200
 
-#define             macUSARTx                                USART2    
+#define             macUSARTx                                USART1    
 #define             macUSART_TX_PORT                         GPIOA   
-#define             macUSART_TX_PIN                          GPIO_PIN_2
+#define             macUSART_TX_PIN                          GPIO_PIN_9
 #define             macUSART_RX_PORT                         GPIOA 
-#define             macUSART_RX_PIN                          GPIO_PIN_3
-#define             macUSART_IRQ                             USART2_IRQn
-#define             macUSART_INT_FUN                         USART2_IRQHandler
+#define             macUSART_RX_PIN                          GPIO_PIN_10
+#define             macUSART_IRQ                             USART1_IRQn
+#define             macUSART_INT_FUN                         USART1_IRQHandler
 /* USART6 define ----------------------------------------------------------*/
 /*#define USART6_RX_PIN              GPIO_PIN_12             // USART6-RX
 #define USART6_RX_PORT             GPIOA

@@ -9,13 +9,13 @@
 #include "MSerial.h"
 
 // weak functions
-__weak void USART1_OffReceive(void) {}                   // turn off receiver
-__weak void USART1_PreReceive(void) {}                   // prepare for receiving
-__weak void USART1_PreTransmit(void){}                   // prepare for transmitting
-__weak void USART1_StartSend(void)  {}                   // start to transmit
-__weak U8   USART1_GetByte(U8* pData)       { return 0;} // get a byte from USAR6T-buffer
-__weak U8   USART1_Write(U8* pData, U8 len) { return 0;} // write some bytes to USART1-buffer
-__weak U8   USART1_GetStatus(void)          { return 0;} // get USART1 state
+__weak void USART3_OffReceive(void) {}                   // turn off receiver
+__weak void USART3_PreReceive(void) {}                   // prepare for receiving
+__weak void USART3_PreTransmit(void){}                   // prepare for transmitting
+__weak void USART3_StartSend(void)  {}                   // start to transmit
+__weak U8   USART3_GetByte(U8* pData)       { return 0;} // get a byte from USAR6T-buffer
+__weak U8   USART3_Write(U8* pData, U8 len) { return 0;} // write some bytes to USART1-buffer
+__weak U8   USART3_GetStatus(void)          { return 0;} // get USART1 state
 
 __weak U16 OnNewSend()  {return 0;}           // FALSE:no data to send
 __weak U16 OnNewRecv()  {return 0;}           // FALSE:do not deal the received data
@@ -85,8 +85,8 @@ static void OnSend(void)
 		if(OnNewSend())                                // handle whether there is data to send or not
 		{
 			m_state = S_WAITING;                       // if need to send data this time then turn to [waiting] state
-			USART1_PreTransmit();                      // diable RXNEIE,enable TCIE and RS485-DE,clear buffer
-			USART1_Write(m_txBuf, m_txLen);            // copy send data to uart tx buffer
+			USART3_PreTransmit();                      // diable RXNEIE,enable TCIE and RS485-DE,clear buffer
+			USART3_Write(m_txBuf, m_txLen);            // copy send data to uart tx buffer
 		}
 //		else
 //		{
@@ -102,13 +102,13 @@ static void Waiting(void)
 	if(m_stateCnt>=m_tmWait)                       // waiting time is over
 	{
 		m_state = S_SENDING;                       // turn to [sending] state
-		USART1_StartSend();                        // starting to transmit
+		USART3_StartSend();                        // starting to transmit
 	}
 }
 
 static void Sending(void)
 {
-	if(0==USART1_GetStatus())                      // send over
+	if(0==USART3_GetStatus())                      // send over
 	{
 		m_state = S_RECEIVE;                       // change to receive state
 		m_rxLen = 0;                               // clear receiver buffer
@@ -118,7 +118,7 @@ static void Sending(void)
 
 static void Receiving(U16 tmOnce)
 {
-	while(USART1_GetByte(&m_rxBuf[m_rxLen]))       // get uart rx data to receiver buffer one by one
+	while(USART3_GetByte(&m_rxBuf[m_rxLen]))       // get uart rx data to receiver buffer one by one
 	{
 		m_rxLen++;                                 // receiver length plus one
 		m_idleCnt = 0;                             // clear idle counter

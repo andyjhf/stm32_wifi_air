@@ -112,6 +112,8 @@ void StartXTaskEsp8266(void const * argument)
 		{
 			if(g_SmartConfig)
 			{
+				g_wifiReady = 0;
+				g_wifiLink = 0;
 				ESP8266_Net_Mode_Choose(STA);
 				ESP8266_Net_Auto_Connect();
 				result = ESP8266_SmartConfig();

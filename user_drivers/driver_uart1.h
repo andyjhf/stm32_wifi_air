@@ -27,14 +27,14 @@ typedef struct
 	USART_STATUES status;                          // uart status of receive or transmit
 }USART_DATA;
 
-void USART1_OffReceive(void);                      // turn off receiver
-void USART1_PreReceive(void);                      // prepare for receiving
-void USART1_PreTransmit(void);                     // prepare for transmitting
-void USART1_StartSend(void);                       // start to transmit
-void USART1_Init(void);                            // initialize USART1
-uint8_t USART1_GetByte(uint8_t* pData);            // get a byte from USAR6T-buffer
-uint8_t USART1_Write(uint8_t* pData, uint8_t len); // write some bytes to USART1-buffer
-uint8_t USART1_GetStatus(void);                    // get USART1 state
+void USART3_OffReceive(void);                      // turn off receiver
+void USART3_PreReceive(void);                      // prepare for receiving
+void USART3_PreTransmit(void);                     // prepare for transmitting
+void USART3_StartSend(void);                       // start to transmit
+void USART3_Init(void);                            // initialize USART1
+uint8_t USART3_GetByte(uint8_t* pData);            // get a byte from USAR6T-buffer
+uint8_t USART3_Write(uint8_t* pData, uint8_t len); // write some bytes to USART1-buffer
+uint8_t USART3_GetStatus(void);                    // get USART1 state
 
 #ifdef __cplusplus
 }

@@ -6,7 +6,7 @@
 #ifdef __cplusplus
 	extern "C" {
 #endif
-void USART2_Init( void );
+void USART1_Init( void );
 
 #ifdef __cplusplus
 }

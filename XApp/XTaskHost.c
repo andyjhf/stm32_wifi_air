@@ -1,7 +1,7 @@
 #include "XTaskHost.h"
 #include "XApp.h"
 
-static U16 m_tmBlink1   = 250;
+static U16 m_tmBlink1   = 100;
 static U16 m_tmBlink2   = 2000;
 
 static U16 m_PowerCnt    = 0;
@@ -18,7 +18,7 @@ osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
 void CXTaskHost_InitTask(void)
 {
-	m_tmBlink1   = 250;
+	m_tmBlink1   = 100;
 	m_tmBlink2   = 2000;
 
 	m_PowerCnt    = 0;
@@ -48,28 +48,30 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 			if(m_smartLink)
 			{
 				m_wifiReady = 0;
-				LED_Toggle(LED1);
+				LED_Set(LED1, LED_OFF);
+				LED_Toggle(LED2);
 			}
 			else if(0==m_wifiReady)                     // wifi ready state is not OK
 			{
-				LED_Set(LED1, LED_OFF);
+				LED_Set(LED2, LED_OFF);
+				LED_Toggle(LED1);
 			}
 		}
 		else                                       // LED2 is in manual mode
 		{
 			LED_Set(LED1,g_led1);
 		}
-		if(0xff==g_led2)                           // LED3 is in auto mode
-		{
-			if(0==m_airModuleState)                      // ERV Comm ready state is not OK
-			{
-				LED_Toggle(LED2);                  // keep led3 blink by the interval of 250ms
-			}
-		}
-		else                                       // LED3 is in manual mode
-		{
-			LED_Set(LED2,g_led2);
-		}
+//		if(0xff==g_led2)                           // LED3 is in auto mode
+//		{
+//			if(0==m_airModuleState)                      // ERV Comm ready state is not OK
+//			{
+//				LED_Toggle(LED2);                  // keep led3 blink by the interval of 250ms
+//			}
+//		}
+//		else                                       // LED3 is in manual mode
+//		{
+//			LED_Set(LED2,g_led2);
+//		}
 	}
 
 	// led indicator(blink slowly)
@@ -90,17 +92,17 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 				LED_Toggle(LED1);                  // toggle led2(blink)
 			}
 		}
-		if(0xff==g_led2)
-		{
-			if(1==m_airModuleState)
-			{
-				LED_Set(LED2, LED_ON);             // keep led3 on
-			}
-			else
-			{
-				LED_Toggle(LED2);                  // toggle led3(blink)
-			}
-		}
+//		if(0xff==g_led2)
+//		{
+//			if(1==m_airModuleState)
+//			{
+//				LED_Set(LED2, LED_ON);             // keep led3 on
+//			}
+//			else
+//			{
+//				LED_Toggle(LED2);                  // toggle led3(blink)
+//			}
+//		}
 	}	
 
 

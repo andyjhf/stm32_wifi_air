@@ -52,7 +52,7 @@ int main(void)
   HAL_Init();
   SystemClock_Config();
   GPIO_CLK_Init();
-	USART2_Init();
+	USART1_Init();
 	LED_Init(LED1);
 	LED_Init(LED2);
 	LED_On(LED2);
@@ -60,7 +60,7 @@ int main(void)
 	if(!SWI_GetState(SW1_1))
 		g_SmartConfig = 1;
 	printf("system init\r\n");
-	USART1_Init();
+	USART3_Init();
 	IWDG_Init();
 	CXTaskHost_InitTask();
 	XTaskEsp8266_Init();
