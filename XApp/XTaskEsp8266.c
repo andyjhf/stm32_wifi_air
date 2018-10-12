@@ -10,7 +10,7 @@ static uint8_t m_state = 0;
 static uint8_t m_linked_ap = 0;
 static uint8_t m_linked_server = 0;
 static uint8_t m_disconnect_server = 0;
-static uint8_t m_send_togle = 1;
+static uint8_t m_send_togle = 0;
 
 static uint8_t m_link_cnt = 0;
 
@@ -23,7 +23,7 @@ static uint8_t m_Dis_Link_cnt = 0;
 static char* pHttpStr;
 
 #define KEY    "xUrvOCDB=iRuS5noq9FsKrvoW=s="
-#define POST_URL    "devices/5835707/datapoints"
+#define POST_URL    "dataCollection/index.jsp"//"devices/5835707/datapoints"
 #define GET_URL    "devices/5835707"
 char send_buf[2048];
 void StartXTaskEsp8266(void const * argument)
@@ -203,7 +203,7 @@ void StartXTaskEsp8266(void const * argument)
 					}
 					else
 					{
-						m_send_togle = 1;
+						m_send_togle = 0;
 						memset(json_buf,0,sizeof(json_buf));
 						data_to_Json((U8 *)json_buf);
 						memset(send_buf,0,sizeof(send_buf));

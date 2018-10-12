@@ -24,7 +24,7 @@
 
 #include "cmsis_os.h"
 
-#define      macUser_ESP8266_TcpServer_IP                 "183.230.40.33"      //要连接的服务器的 IP
+#define      macUser_ESP8266_TcpServer_IP                 "47.96.142.127"      //要连接的服务器的 IP
 #define      macUser_ESP8266_TcpServer_Port               "80"               //要连接的服务器的端口
 
 #define  SZ_OEM_VER_SIZE  50                       // oem host version prop buffer size
