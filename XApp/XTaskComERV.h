@@ -11,6 +11,12 @@
 #define INDEX_AIR_PM1_0						4
 #define INDEX_AIR_PM2_5						6
 #define INDEX_AIR_PM10						8
+#define INDEX_AIR_M0_3						16
+#define INDEX_AIR_M0_5						18
+#define INDEX_AIR_M1_0						20
+#define INDEX_AIR_M2_5						22
+#define INDEX_AIR_M5_0						24
+#define INDEX_AIR_M10_0						26
 #define INDEX_TVOC								28
 #define INDEX_HCHO								31
 #define INDEX_CO2									34

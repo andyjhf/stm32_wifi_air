@@ -86,6 +86,12 @@ U16 OnNewRecv(void)
 		g_AirPM1_0    = (m_rxBuf[INDEX_AIR_PM1_0]<<8) | m_rxBuf[INDEX_AIR_PM1_0+1];
 		g_AirPM2_5    = (m_rxBuf[INDEX_AIR_PM2_5]<<8) | m_rxBuf[INDEX_AIR_PM2_5+1];
 		g_AirPM10     = (m_rxBuf[INDEX_AIR_PM10]<<8) | m_rxBuf[INDEX_AIR_PM10+1];
+		g_AirM0_3    = (m_rxBuf[INDEX_AIR_M0_3]<<8) | m_rxBuf[INDEX_AIR_M0_3+1];																		
+		g_AirM0_5    = (m_rxBuf[INDEX_AIR_M0_5]<<8) | m_rxBuf[INDEX_AIR_M0_5+1];
+		g_AirM1_0    = (m_rxBuf[INDEX_AIR_M1_0]<<8) | m_rxBuf[INDEX_AIR_M1_0+1];
+		g_AirM2_5    = (m_rxBuf[INDEX_AIR_M2_5]<<8) | m_rxBuf[INDEX_AIR_M2_5+1];
+		g_AirM5_0    = (m_rxBuf[INDEX_AIR_M5_0]<<8) | m_rxBuf[INDEX_AIR_M5_0+1];
+		g_AirM10_0    = (m_rxBuf[INDEX_AIR_M10_0]<<8) | m_rxBuf[INDEX_AIR_M10_0+1];
 		g_TVOC        = (m_rxBuf[INDEX_TVOC]<<8) | m_rxBuf[INDEX_TVOC+1];
 		g_HCHO        = (m_rxBuf[INDEX_HCHO]<<8) | m_rxBuf[INDEX_HCHO+1];
 		g_CO2         = (m_rxBuf[INDEX_CO2]<<8) | m_rxBuf[INDEX_CO2+1];

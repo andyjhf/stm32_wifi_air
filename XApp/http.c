@@ -1,5 +1,7 @@
 #include "http.h"
+#include "XApp.h"
 #include<stdio.h>
+#include<stdlib.h>
 #include<string.h>
 
 /**
@@ -60,14 +62,85 @@ U32 HTTP_PostPkt(char *pkt,const char* url, const char *key, const char *ip,cons
   return strlen(pkt);
 }
 
-
-U8 Json_to_data(char * json, json_param *data)
+U8 Json_to_data(char * json, json_response_param *data)
 {
 	cJSON *root = cJSON_Parse(json);
 	if(!root) {
 		printf("get root faild !\n");
 		return 1;
 	}
+	cJSON *item = cJSON_GetObjectItem(root,"state");
+	if(item != NULL)
+	{
+		data->state = item->valueint;
+	}
+	
+	item = cJSON_GetObjectItem(root,"errcode");
+	if(item != NULL)
+	{
+		data->errcode = item->valueint;
+	}
+	
+	item = cJSON_GetObjectItem(root,"errmsg");
+	if(item != NULL)
+	{
+		memcpy(data->errmsg,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"deviceid");
+	if(item != NULL)
+	{
+		memcpy(data->deviceid,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"switch");
+	if(item != NULL)
+	{
+		data->m_switch = item->valueint;
+	}
+	
+	item = cJSON_GetObjectItem(root,"interval");
+	if(item != NULL)
+	{
+		data->m_switch = item->valueint;
+	}
+	
+	item = cJSON_GetObjectItem(root,"deviceaddress");
+	if(item != NULL)
+	{
+		memcpy(data->deviceaddress,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"deviceip");
+	if(item != NULL)
+	{
+		memcpy(data->deviceip,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"devicemac");
+	if(item != NULL)
+	{
+		memcpy(data->devicemac,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"serverip");
+	if(item != NULL)
+	{
+		memcpy(data->serverip,item->valuestring,strlen(item->valuestring));
+	}
+	
+	item = cJSON_GetObjectItem(root,"port");
+	if(item != NULL)
+	{
+		data->port = item->valueint;
+	}
+	
+/*cJSON *root = cJSON_Parse(json);
+	if(!root) {
+		printf("get root faild !\n");
+		return 1;
+	}	
+
 	cJSON *item = cJSON_GetObjectItem(root,"errno");
 	if(item != NULL)
 	{
@@ -161,14 +234,14 @@ U8 Json_to_data(char * json, json_param *data)
 			}
 		}
 	
-	}
+	}*/
 	cJSON_Delete(root);
 	return 0;
 }
 
 U8 data_to_Json(U8 *Json)
 {
-	cJSON *root, *js_body, *js_list,*js_sub_body;
+/*	cJSON *root, *js_body, *js_list,*js_sub_body;
 	root = cJSON_CreateObject();
 	cJSON_AddItemToObject(root,"datastreams", js_body = cJSON_CreateArray());
 	cJSON_AddItemToArray(js_body, js_list = cJSON_CreateObject());
@@ -178,6 +251,41 @@ U8 data_to_Json(U8 *Json)
 	cJSON_AddNumberToObject(js_list,"value",1);
 	char *s = cJSON_PrintUnformatted(root);
 	memcpy(Json,s,strlen(s));
+	if(root)
+		cJSON_Delete(root);*/
+
+	cJSON *root;
+	root = cJSON_CreateObject();
+	if(!root)
+	{
+		printf("create json fail.\r\n");
+		return 1;
+	}
+	cJSON_AddStringToObject(root,"deviceid","device1");
+	cJSON_AddNumberToObject(root,"pm1.0",g_AirPM1_0);
+	cJSON_AddNumberToObject(root,"pm2.5",g_AirPM2_5);
+	cJSON_AddNumberToObject(root,"pm10",g_AirPM10);
+	cJSON_AddNumberToObject(root,"m0.3",g_AirM0_3);
+	cJSON_AddNumberToObject(root,"m0.5",g_AirM0_5);
+	cJSON_AddNumberToObject(root,"m1.0",g_AirM1_0);
+	cJSON_AddNumberToObject(root,"m2.5",g_AirM2_5);
+	cJSON_AddNumberToObject(root,"m5.0",g_AirM5_0);
+	cJSON_AddNumberToObject(root,"m10.0",g_AirM10_0);
+	cJSON_AddNumberToObject(root,"tvoc",g_TVOC);
+	cJSON_AddNumberToObject(root,"hcho",g_HCHO);
+	cJSON_AddNumberToObject(root,"co2",g_CO2);
+	cJSON_AddNumberToObject(root,"temperature",g_Temperature);
+	cJSON_AddNumberToObject(root,"humidity",g_Humidity);
+	cJSON_AddNumberToObject(root,"otherparam",0);
+	char *s = cJSON_PrintUnformatted(root);
+	if(s)
+	{
+//		printf(" %s \n",s);
+		memcpy(Json,s,strlen(s));
+		free(s);
+	}
+	else
+		return 1;
 	if(root)
 		cJSON_Delete(root);
 	return 0;

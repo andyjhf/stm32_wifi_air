@@ -4,13 +4,12 @@
 
 osThreadId XTaskEsp8266Handle;
 
-json_param m_data;
-uint8_t json_buf[128];
+json_response_param m_data;
+uint8_t json_buf[1024];
 static uint8_t m_state = 0;
 static uint8_t m_linked_ap = 0;
 static uint8_t m_linked_server = 0;
 static uint8_t m_disconnect_server = 0;
-static uint8_t m_send_togle = 0;
 
 static uint8_t m_link_cnt = 0;
 
@@ -76,15 +75,6 @@ void StartXTaskEsp8266(void const * argument)
 			case AP_Disconnect:
 				m_linked_ap = 0;
 				m_linked_server = 0;
-				
-//				m_Dis_Link_cnt++;
-//				if(m_Dis_Link_cnt > 10)
-//				{
-//					m_Dis_Link_cnt = 0;
-//					printf("=====reset wifi module\r\n");
-//					ESP8266_Rst();
-//					osDelay(15000);
-//				}
 				m_state = 1;
 				m_error_cnt = 0;
 				g_wifiReady = 0;
@@ -128,23 +118,7 @@ void StartXTaskEsp8266(void const * argument)
 				}
 			}
 			else
-			{
-//				if(m_send_get)
-//				{
-//					if(!ESP8266_Enable_MultipleId(DISABLE)
-//						&& !ESP8266_Link_Server(enumTCP, macUser_ESP8266_TcpServer_IP, macUser_ESP8266_TcpServer_Port, Single_ID_0))
-//					{
-//						memset(send_buf,0,sizeof(send_buf));
-//						HTTP_GetPkt(send_buf,GET_URL,KEY,macUser_ESP8266_TcpServer_IP,macUser_ESP8266_TcpServer_Port);
-//						printf("%s\r\n",send_buf);
-//						if(!ESP8266_SendString (DISABLE, send_buf, strlen(send_buf), Single_ID_0))
-//							ESP8266_Receive(DISABLE,10000);
-//						m_send_get = 0;
-//					}
-//				}
-//				
-//				if(m_linked_ap)
-				
+			{				
 				if(m_disconnect_server)
 				{
 					m_disconnect_server = 0;
@@ -173,12 +147,12 @@ void StartXTaskEsp8266(void const * argument)
 				if(m_linked_server)
 				{
 					m_linked_server = 0;
-					
-					if(m_send_togle)
-					{
-						m_send_togle = 0;
+//					{
+						memset(json_buf,0,sizeof(json_buf));
+						result = data_to_Json((U8 *)json_buf);
+						printf("=%d===%s\r\n",result,json_buf);
 						memset(send_buf,0,sizeof(send_buf));
-						HTTP_GetPkt(send_buf,GET_URL,KEY,macUser_ESP8266_TcpServer_IP,macUser_ESP8266_TcpServer_Port);
+						HTTP_PostPkt(send_buf,POST_URL,KEY,macUser_ESP8266_TcpServer_IP,macUser_ESP8266_TcpServer_Port,(char *)json_buf);
 						printf("%s\r\n",send_buf);
 						if(!ESP8266_SendString (ENABLE, send_buf, strlen(send_buf), Single_ID_0))
 						{
@@ -188,35 +162,14 @@ void StartXTaskEsp8266(void const * argument)
 								pJson = strstr(pHttpStr,"{");
 								if(pJson != NULL)
 								{
-									Json_to_data(pJson,&m_data);
-									printf("protocol :%s\r\n",m_data.data.protocol);
-									printf("auth_info :%s\r\n",m_data.data.auth_info);
-									printf("title: %s\r\n",m_data.data.title);						
+									Json_to_data(pJson,&m_data);					
 								}
 							}
-							
 						}
 						ESP8266_ExitUnvarnishSend();
 						osDelay(300);
 						ESP8266_Disconnet_Link_Server();
-						printf("====protocol :%s\r\n",m_data.data.protocol);
-					}
-					else
-					{
-						m_send_togle = 0;
-						memset(json_buf,0,sizeof(json_buf));
-						data_to_Json((U8 *)json_buf);
-						memset(send_buf,0,sizeof(send_buf));
-						HTTP_PostPkt(send_buf,POST_URL,KEY,macUser_ESP8266_TcpServer_IP,macUser_ESP8266_TcpServer_Port,(char *)json_buf);
-						printf("%s\r\n",send_buf);
-						if(!ESP8266_SendString (ENABLE, send_buf, strlen(send_buf), Single_ID_0))
-						{
-							pHttpStr = ESP8266_Receive(ENABLE,10000);
-						}
-						ESP8266_ExitUnvarnishSend();
-						osDelay(300);
-						ESP8266_Disconnet_Link_Server();
-					}
+//					}
 				}
 			}
 		}

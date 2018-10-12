@@ -12,6 +12,12 @@ extern U8  g_SmartConfig;														//÷«ƒ‹≈‰÷√wifi
 extern U16 g_AirPM1_0;																		//PM1.0
 extern U16 g_AirPM2_5;																		//PM2.5
 extern U16 g_AirPM10;																		//PM10
+extern U16 g_AirM0_3;																		//PM1.0
+extern U16 g_AirM0_5;																		//PM2.5
+extern U16 g_AirM1_0;																		//PM10
+extern U16 g_AirM2_5;																		//PM1.0
+extern U16 g_AirM5_0;																		//PM2.5
+extern U16 g_AirM10_0;																		//PM10
 extern U16 g_TVOC;
 extern U16 g_HCHO;
 extern U16 g_CO2;

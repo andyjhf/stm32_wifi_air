@@ -5,6 +5,13 @@ U8  g_SmartConfig = 0;														//÷«ƒ‹≈‰÷√wifi
 U16 g_AirPM1_0;																		//PM1.0
 U16 g_AirPM2_5;																		//PM2.5
 U16 g_AirPM10;																		//PM10
+U16 g_AirM0_3;																		//PM1.0
+U16 g_AirM0_5;																		//PM2.5
+U16 g_AirM1_0;																		//PM10
+U16 g_AirM2_5;																		//PM1.0
+U16 g_AirM5_0;																		//PM2.5
+U16 g_AirM10_0;																		//PM10
+
 U16 g_TVOC;
 U16 g_HCHO;
 U16 g_CO2;
