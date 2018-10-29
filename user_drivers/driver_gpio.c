@@ -1,12 +1,3 @@
-
-/*******************************************************************************
- * @file    driver_rcc.c
- * @author  jianchuan.zhao
- * @version V1.0.0
- * @date    2016-01-20
- * @brief   This file provides all LED/SWI/WIFI-Pin/LEFT functions.
- *******************************************************************************/
-
 #include "driver_gpio.h"
 
 static GPIO_TypeDef*  const GPIO_LED_PORT[LEDn] = {LED1_PORT,LED2_PORT};

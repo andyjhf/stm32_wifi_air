@@ -1,11 +1,3 @@
-/*******************************************************************************
- * @file    MSerial.cpp
- * @author  jianchuan.zhao
- * @version V1.0.0
- * @date    12/12/2014
- * @brief   This file provides all ... functions.
- *******************************************************************************/
- 
 #include "MSerial.h"
 
 // weak functions

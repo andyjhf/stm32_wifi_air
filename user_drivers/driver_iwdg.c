@@ -1,11 +1,3 @@
-/*******************************************************************************
- * @file    driver_iwdg.c
- * @author  jianchuan.zhao
- * @version V1.0.0
- * @date    2016-01-26
- * @brief   This file provides IWDG functions.
- *******************************************************************************/
- 
 #include "driver_iwdg.h"
 
 static IWDG_HandleTypeDef IWDG_Handle;

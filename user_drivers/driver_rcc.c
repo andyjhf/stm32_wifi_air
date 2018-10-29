@@ -1,11 +1,3 @@
-/*******************************************************************************
- * @file    driver_USART1.c
- * @author  jianchuan.zhao
- * @version V1.0.0
- * @date    2016-01-26
- * @brief   This file provides all rs485 functions.
- *******************************************************************************/
- 
 #include "driver_rcc.h"
 
 /**

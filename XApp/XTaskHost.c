@@ -12,7 +12,7 @@ static U16 m_blinkCnt2   = 0;
 static U8 m_wifiReady = 0;                               // 1: wifi module ready(started)
 static U8 m_wifiLink  = 0;                               // 1: wifi module linked to ayla cloud
 static U8 m_smartLink = 0;
-static U8 m_airModuleState  = 0;                               // 1: erv comm ready
+static U8 m_airModuleState  = 0;                         
 
 osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
@@ -63,7 +63,7 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 		}
 //		if(0xff==g_led2)                           // LED3 is in auto mode
 //		{
-//			if(0==m_airModuleState)                      // ERV Comm ready state is not OK
+//			if(0==m_airModuleState)                      
 //			{
 //				LED_Toggle(LED2);                  // keep led3 blink by the interval of 250ms
 //			}
