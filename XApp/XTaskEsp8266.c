@@ -174,7 +174,7 @@ void StartXTaskEsp8266(void const * argument)
 			}
 		}
 		m_send_time++;
-		if(m_send_time >= 7)
+		if(m_send_time >= 20)
 		{
 			m_send_time = 0;
 			m_send_get = 1;
