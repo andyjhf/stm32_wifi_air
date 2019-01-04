@@ -40,6 +40,7 @@
 #include "main.h"
 //#include "cmsis_os.h"
 #include "XApp.h"
+#include "hcho.h"
 
 /**
   * @brief  The application entry point.
@@ -62,16 +63,19 @@ int main(void)
 	printf("system init\r\n");
 	USART3_Init();
 	IWDG_Init();
+	hcho_adc_Init();
 	CXTaskHost_InitTask();
 	XTaskEsp8266_Init();
 	CXTaskComERV_InitTask();
-	
+//	osThreadDef(XTaskAirModule, Starttask, osPriorityAboveNormal, 0, 128);
+//  XTaskAHandle = osThreadCreate(osThread(XTaskAirModule), NULL);
 	osKernelStart();
   /* USER CODE BEGIN 2 */
   while (1)
   {
 		osDelay(1000);
-
+		hcho_adc_sample();
+		printf("temp = %d.%d \r\n",tp_val/10,tp_val%10);
   }
   
 

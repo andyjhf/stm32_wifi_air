@@ -95,7 +95,7 @@ U16 OnNewRecv(void)
 		g_TVOC        = (m_rxBuf[INDEX_TVOC]<<8) | m_rxBuf[INDEX_TVOC+1];
 		g_HCHO        = (m_rxBuf[INDEX_HCHO]<<8) | m_rxBuf[INDEX_HCHO+1];
 		g_CO2         = (m_rxBuf[INDEX_CO2]<<8) | m_rxBuf[INDEX_CO2+1];
-		g_Temperature = (m_rxBuf[INDEX_TEMP]<<8) | m_rxBuf[INDEX_TEMP+1];
+//		g_Temperature = (m_rxBuf[INDEX_TEMP]<<8) | m_rxBuf[INDEX_TEMP+1];
 		g_Humidity    = (m_rxBuf[INDEX_HUMI]<<8) | m_rxBuf[INDEX_HUMI+1];
 //		printf("temp = %d.%d\r\n",g_Temperature/10,g_Temperature%10);
 //		printf("g_AirPM2_5 = %d\r\n",g_AirPM2_5);

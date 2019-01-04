@@ -1,6 +1,6 @@
 #include "XTaskHost.h"
 #include "XApp.h"
-
+#include "hcho.h"
 static U16 m_tmBlink1   = 100;
 static U16 m_tmBlink2   = 2000;
 
@@ -13,7 +13,8 @@ static U8 m_wifiReady = 0;                               // 1: wifi module ready
 static U8 m_wifiLink  = 0;                               // 1: wifi module linked to ayla cloud
 static U8 m_smartLink = 0;
 static U8 m_airModuleState  = 0;                         
-
+static uint16_t cnt = 0;
+static uint8_t sample_sw = 0;
 osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
 void CXTaskHost_InitTask(void)
@@ -121,6 +122,24 @@ static void StartHostTask(void const * argument)
   {
 		CXTaskHost_DoLoop(10);
     osDelay(10);
+		cnt++;
+		if(cnt >1000)
+		{
+			cnt = 0;
+			if(sample_sw == 0)
+			{
+//				sample_sw = 1;
+				hcho_adc_sample();
+				g_Temperature = tp_val;
+				printf("temp = %d.%d \r\n",tp_val/10,tp_val%10);
+			}
+//			else
+//			{
+//				sample_sw = 0;
+//				hm_adc_sample();
+//				printf("hm_val = %d.%d \r\n",hm_val/10,hm_val%10);
+//			}
+		}
   }
 
 }

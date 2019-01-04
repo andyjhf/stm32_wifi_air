@@ -100,7 +100,7 @@ void SWI_Init(SWI_TypeDef swi)
 	// Configure SWI pin as input
 	GPIO_InitStructure.Pin  = GPIO_SWI_PIN[swi];
 	GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	GPIO_InitStructure.Pull = GPIO_PULLUP;
 	GPIO_InitStructure.Speed  = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIO_SWI_PORT[swi], &GPIO_InitStructure);
 }
