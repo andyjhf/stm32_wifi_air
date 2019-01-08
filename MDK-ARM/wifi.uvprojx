@@ -461,6 +461,11 @@
               <FileType>1</FileType>
               <FilePath>..\user_drivers\hcho.c</FilePath>
             </File>
+            <File>
+              <FileName>dht11.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_drivers\dht11.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

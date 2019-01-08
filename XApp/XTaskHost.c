@@ -1,6 +1,7 @@
 #include "XTaskHost.h"
 #include "XApp.h"
 #include "hcho.h"
+#include "dht11.h"
 static U16 m_tmBlink1   = 100;
 static U16 m_tmBlink2   = 2000;
 
@@ -13,8 +14,12 @@ static U8 m_wifiReady = 0;                               // 1: wifi module ready
 static U8 m_wifiLink  = 0;                               // 1: wifi module linked to ayla cloud
 static U8 m_smartLink = 0;
 static U8 m_airModuleState  = 0;                         
-static uint16_t cnt = 0;
-static uint8_t sample_sw = 0;
+
+static U16 m_sampleCnt = 0;
+static U16 m_tmSample = 10000;
+static U16 m_humi;
+static U16 m_temp;
+
 osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
 void CXTaskHost_InitTask(void)
@@ -30,12 +35,13 @@ void CXTaskHost_InitTask(void)
 	m_wifiLink  = 0;                               // 1: wifi module linked to ayla cloud
 	m_airModuleState  = 0;
 	
-	osThreadDef(HostTask, StartHostTask, osPriorityNormal, 0, 128);
+	osThreadDef(HostTask, StartHostTask, osPriorityRealtime, 0, 128);
   HostTaskHandle = osThreadCreate(osThread(HostTask), NULL);
 }
 
 static void CXTaskHost_DoLoop(U16 tmOnce)
 {
+	U8 result;
 	// led indicator(blink quickly)
 	if(m_blinkCnt1>=m_tmBlink1)
 	{
@@ -106,7 +112,18 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 //		}
 	}	
 
-
+	if(m_sampleCnt>=m_tmSample)
+	{
+		m_sampleCnt = 0;
+		taskDISABLE_INTERRUPTS();
+		result = DHT11_get_data(&m_temp, &m_humi);
+		taskENABLE_INTERRUPTS();
+		if(result == 1)
+		{
+			printf("temp = %d.%d \r\n",m_temp/10,m_temp%10);
+			printf("humi = %d.%d \r\n",m_humi/10,m_humi%10);
+		}
+	}
 
 	if(m_PowerCnt<6000)	                           // 6000ms counter waiting for WiFi's initilization after power on
 	{
@@ -114,6 +131,7 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 	}
 	m_blinkCnt1    += tmOnce;                      // 250ms counter for slow blinking 
 	m_blinkCnt2    += tmOnce;                      // 2000ms counter for quick blinking
+	m_sampleCnt    += tmOnce;
 }
 
 static void StartHostTask(void const * argument)
@@ -121,25 +139,7 @@ static void StartHostTask(void const * argument)
   for(;;)
   {
 		CXTaskHost_DoLoop(10);
-    osDelay(10);
-		cnt++;
-		if(cnt >1000)
-		{
-			cnt = 0;
-			if(sample_sw == 0)
-			{
-//				sample_sw = 1;
-				hcho_adc_sample();
-				g_Temperature = tp_val;
-				printf("temp = %d.%d \r\n",tp_val/10,tp_val%10);
-			}
-//			else
-//			{
-//				sample_sw = 0;
-//				hm_adc_sample();
-//				printf("hm_val = %d.%d \r\n",hm_val/10,hm_val%10);
-//			}
-		}
+		osDelay(10);
   }
 
 }

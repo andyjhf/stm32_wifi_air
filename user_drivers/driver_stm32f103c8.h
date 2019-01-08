@@ -37,7 +37,7 @@ typedef enum
 */
 /* SWI define ------------------------------------------------------------*/
 #define SWIn                       2
-#define SWI1_PIN                   GPIO_PIN_8             // SW1-1
+#define SWI1_PIN                   GPIO_PIN_6             // SW1-1
 #define SWI1_PORT                  GPIOA
 //#define SWI1_CLK                   RCC_AHB1ENR_GPIOBEN
 #define SWI2_PIN                   GPIO_PIN_14             // SW1-2
