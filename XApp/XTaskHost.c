@@ -116,11 +116,16 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 	{
 		m_sampleCnt = 0;
 		taskDISABLE_INTERRUPTS();
-		result = DHT11_get_data(&m_temp, &m_humi);
+		result = Read_AM2302(&m_temp, &m_humi);
 		taskENABLE_INTERRUPTS();
-		if(result == 1)
-		{
-			printf("temp = %d.%d \r\n",m_temp/10,m_temp%10);
+		if(result == SUCCESS)
+		{  
+      g_Humidity = m_humi;  
+      g_Temperature = m_temp;
+			if(m_temp & 0x8000)
+				printf("temp = -%d.%d \r\n",(m_temp&0x7F)/10,(m_temp&0x7F)%10);
+			else
+				printf("temp = %d.%d \r\n",m_temp/10,m_temp%10);
 			printf("humi = %d.%d \r\n",m_humi/10,m_humi%10);
 		}
 	}
@@ -136,6 +141,7 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 
 static void StartHostTask(void const * argument)
 {
+	AM2302_GPIO_Config();
   for(;;)
   {
 		CXTaskHost_DoLoop(10);

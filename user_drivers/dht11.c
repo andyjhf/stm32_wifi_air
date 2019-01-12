@@ -18,264 +18,137 @@ void delay_ms(uint32_t nTimer)
 	delay_us(i);
 }
 
-#if 1
-
-//uint8_t U8T_data_H,U8T_data_L,U8RH_data_H,U8RH_data_L,U8checkdata;
-//uint8_t U8T_data_H_temp,U8T_data_L_temp,U8RH_data_H_temp,U8RH_data_L_temp,U8checkdata_temp;
- 
-#define BOOL unsigned char
- 
-#ifndef TRUE
-#define TRUE 1
-#endif
- 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-static void DHT11_DataPin_Configure_Output(void)
+//#include "am2302.h"
+//#include "delay.h"
+/*
+ *???:
+ *??  :
+ *??  :
+ *??  :
+*/
+void AM2302_GPIO_Config(void)
 {
+  GPIO_InitTypeDef  GPIO_InitStructure;
+	
+	GPIO_InitStructure.Pin = AM2302_PIN;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	GPIO_InitStructure.Pull  = GPIO_NOPULL;
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //Õ∆ÕÏ ‰≥ˆ
+
+	HAL_GPIO_Init(AM2302_GPIO_PORT, &GPIO_InitStructure);      
+		 
+	HAL_GPIO_WritePin(AM2302_GPIO_PORT, AM2302_PIN, GPIO_PIN_SET);
+ 
+}
+
+/* 
+ * ???:AM2302_Mode_IPU 
+ * ??  :?AM2302-DATA???????? 
+ * ??  :? 
+ * ??  :? 
+ */  
+static void AM2302_Mode_IPU(void)  
+{  
 	GPIO_InitTypeDef  GPIO_InitStructure;
-    
-    GPIO_InitStructure.Pin = GPIO_PIN_1;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
-		GPIO_InitStructure.Pull  = GPIO_NOPULL;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //Õ∆ÕÏ ‰≥ˆ
-
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
-}
- 
-static void DHT11_DataPin_Configure_Input(void)
-{
-		GPIO_InitTypeDef  GPIO_InitStructure;
-    
-    GPIO_InitStructure.Pin = GPIO_PIN_1;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
-		GPIO_InitStructure.Pull  = GPIO_NOPULL;
-    GPIO_InitStructure.Mode = GPIO_MODE_INPUT; //∏°ø’ ‰»Î
-    
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
-}
-BOOL DHT11_get_databit(void)
-{
-	uint8_t val;
-
-	val = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-	if(val == GPIO_PIN_RESET){
-		return FALSE;
-	}else{
-		return TRUE;
-	}
-}
- 
-void DHT11_set_databit(BOOL level)
-{
-	if(level == TRUE){
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
-	}else{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
-	}
-}
- 
-void mdelay(uint16_t ms)
-{
-	if(ms != 0){
-		delay_ms(ms);
-	}
-}
- 
-void udelay(uint16_t us)
-{
-	if(us != 0){
-		delay_us(us);
-	}
-}
-static uint8_t DHT11_read_byte(void)
-{
-	uint8_t i;
-	uint8_t data = 0;
-
-	for(i = 0; i < 8; i++)
-	{
-		data <<= 1;
-		while((!DHT11_get_databit()));
-		udelay(10);
-		udelay(10);
-		udelay(10);
- 
-		if(DHT11_get_databit()){
-			data |= 0x1;
-			while(DHT11_get_databit());
-		} else{
+	GPIO_InitStructure.Pin = AM2302_PIN;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	GPIO_InitStructure.Pull  = GPIO_NOPULL;
+	GPIO_InitStructure.Mode = GPIO_MODE_INPUT; //∏°ø’ ‰»Î
 	
-		} 
- 
-	}
+	HAL_GPIO_Init(AM2302_GPIO_PORT, &GPIO_InitStructure);
+}  
 
-	return data;
-}
+/* 
+ * ???:AM2302_Mode_Out_PP 
+ * ??  :?AM2302-DATA???????? 
+ * ??  :? 
+ * ??  :? 
+ */  
+static void AM2302_Mode_Out_PP(void)  
+{  
+  GPIO_InitTypeDef  GPIO_InitStructure;
+	
+	GPIO_InitStructure.Pin = AM2302_PIN;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	GPIO_InitStructure.Pull  = GPIO_NOPULL;
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //Õ∆ÕÏ ‰≥ˆ
 
-static uint8_t DHT11_start_sampling(void)
+	HAL_GPIO_Init(AM2302_GPIO_PORT, &GPIO_InitStructure);            
+} 
+
+static uint8_t Read_Byte(void)  
 {
-	DHT11_DataPin_Configure_Output();
-	//÷˜ª˙¿≠µÕ18ms? ?
-	DHT11_set_databit(FALSE);
-	mdelay(18);
-	DHT11_set_databit(TRUE);
-	//◊‹œﬂ”……œ¿≠µÁ◊Ë¿≠∏ﬂ ÷˜ª˙—” ±20us
-	udelay(10);
-	udelay(10);
-//	udelay(10);
-//	udelay(10);
-	//÷˜ª˙…ËŒ™ ‰»Î ≈–∂œ¥”ª˙œÏ”¶–≈∫≈ 
-	DHT11_set_databit(TRUE);
- 
-	DHT11_DataPin_Configure_Input();
- 
-	//≈–∂œ¥”ª˙ «∑Ò”–µÕµÁ∆ΩœÏ”¶–≈∫≈ »Á≤ªœÏ”¶‘ÚÃ¯≥ˆ£¨œÏ”¶‘ÚœÚœ¬‘À––?? ? ?
-	if(!DHT11_get_databit())//T
-	{
-		//≈–∂œ¥”ª˙ «∑Ò∑¢≥ˆ 80us µƒµÕµÁ∆ΩœÏ”¶–≈∫≈ «∑ÒΩ· ¯?? ? 
-		while((!DHT11_get_databit()));
-		// printf("DHT11 answers.\r\n");
-		//≈–∂œ¥”ª˙ «∑Ò∑¢≥ˆ 80us µƒ∏ﬂµÁ∆Ω£¨»Á∑¢≥ˆ‘ÚΩ¯»Î ˝æ›Ω” ’◊¥Ã¨
-		while((DHT11_get_databit()));
-		return 1;
-	}
- 
-	return 0;
-}
-double hum,temp1;
-uint16_t DHT11_get_data(uint16_t *temp, uint16_t *humi)
-{
-	uint8_t databuffer[5];
-	uint8_t check_crc;
-	if((temp == NULL) || (humi == NULL))
-		return 0;
-	if(DHT11_start_sampling()){
-		//printf("DHT11 is ready to transmit data\r\n");
-		// ˝æ›Ω” ’◊¥Ã¨
-		databuffer[0] = DHT11_read_byte();
-		databuffer[1] = DHT11_read_byte();
-		databuffer[2] = DHT11_read_byte();
-		databuffer[3] = DHT11_read_byte();
-		databuffer[4] = DHT11_read_byte();
-		 
+	uint8_t i, temp=0;  
 
-		DHT11_DataPin_Configure_Output();
-		DHT11_set_databit(TRUE);
-		// ˝æ›–£—È 
-		 
-		check_crc=(databuffer[0]+databuffer[1]+databuffer[2]+databuffer[3]);
-		if(check_crc==databuffer[4])
+	for(i=0;i<8;i++)      
+	{  
+		/*?bit?50us???????,???????? ?50us ??? ??*/   
+		while(AM2302_DATA_IN()  ==  GPIO_PIN_RESET) {} 
+
+		/*AM2302 ?22~30us??????ì0î,?68~75us?????ì1î, 
+		????60us?????????????*/  
+
+		delay_us(30); //??50us              
+		if(AM2302_DATA_IN() == GPIO_PIN_SET)//60us??????????ì1î  
+		{  
+			/*???????????? 30us ?????*/  
+			while(AM2302_DATA_IN()==GPIO_PIN_SET);  
+			temp|=(uint8_t)(0x01<<(7-i));  //??7-i??1   
+		}  
+		else  //60us?????????ì0î  
+		{                 
+			temp&=(uint8_t)~(0x01<<(7-i)); //??7-i??0  
+		}  
+	}  
+	return temp;  
+}  
+
+uint8_t Read_AM2302(uint16_t *temp, uint16_t *humi)
+{
+	unsigned char tmp;
+	uint8_t buffer[5];
+	AM2302_Mode_Out_PP();  
+	AM2302_DATA_OUT(HIGH);  
+	delay_ms(10); 
+	AM2302_DATA_OUT(LOW);  
+	delay_ms(1);  
+	AM2302_DATA_OUT(HIGH);   
+	delay_us(30);
+	AM2302_Mode_IPU();  
+	delay_us(2);      
+	if(AM2302_DATA_IN()==GPIO_PIN_RESET)   //T !     
+	{  
+		/*???????? ?80us ??? ??????*/   
+		while(AM2302_DATA_IN()==GPIO_PIN_RESET){}  
+
+		/*????????? 80us ??? ??????*/  
+		while(AM2302_DATA_IN()==GPIO_PIN_SET){}  
+
+		/*??????*/    
+		buffer[0] = Read_Byte();
+		buffer[1] = Read_Byte();
+		buffer[2] = Read_Byte();
+		buffer[3] = Read_Byte();
+		buffer[4] = Read_Byte();
+		/*????,????????*/  
+		AM2302_Mode_Out_PP();  
+		/*????*/  
+		AM2302_DATA_OUT(HIGH);  
+
+		/*???????????*/  
+		tmp = buffer[0] + buffer[1] + buffer[2] + buffer[3];
+		if(buffer[4] == tmp)
 		{
-			*temp = databuffer[2]*10 + databuffer[3];
-			*humi = databuffer[0]*10 + databuffer[1];
-//			printf("temp = %.2f  hum = %.2f \r\n",temp1,hum);
-			return 1;
-			 
-		}
-	}
-	return 0;
+			*humi = buffer[0]*256 + buffer[1];
+			*temp = buffer[2]*256 + buffer[3];
+			return SUCCESS;
+		}	
+		else  
+			return ERROR;  
+	}  
+	else  
+	{          
+	return ERROR;  
+	}  
 }
-
-#else
-
-void dht11_gpio_input(void)
-{
-    GPIO_InitTypeDef  GPIO_InitStructure;
-    
-    GPIO_InitStructure.Pin = DHT11_GPIO_PIN;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
-		GPIO_InitStructure.Pull  = GPIO_NOPULL;
-    GPIO_InitStructure.Mode = GPIO_MODE_INPUT; //∏°ø’ ‰»Î
-    
-    HAL_GPIO_Init(DHT11_GPIO_TYPE, &GPIO_InitStructure);
-}
-
-void dht11_gpio_output(void)
-{
-    GPIO_InitTypeDef  GPIO_InitStructure;
-    
-    GPIO_InitStructure.Pin = DHT11_GPIO_PIN;
-    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
-		GPIO_InitStructure.Pull  = GPIO_NOPULL;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP; //Õ∆ÕÏ ‰≥ˆ
-
-    HAL_GPIO_Init(DHT11_GPIO_TYPE, &GPIO_InitStructure);
-}
-
-void dht11_reset(void)
-{
-    // ∞¥’’DHT11 ÷≤·≤Ω÷Ë
-    dht11_gpio_output();
-    DHT11_OUT_L;
-    delay_ms(19);
-    DHT11_OUT_H;
-    delay_us(30);
-    dht11_gpio_input();
-}
-
-uint16_t dht11_scan(void)
-{
-    return DHT11_IN;
-}
-
-uint16_t dht11_read_bit(void)
-{
-    while (DHT11_IN == RESET);
-    delay_us(40);
-    if (DHT11_IN == SET)
-    {
-        while (DHT11_IN == SET);
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-uint16_t dht11_read_byte(void)
-{
-    uint16_t i;
-    uint16_t data = 0;
-    for (i = 0; i < 8; i++)
-    {
-        data <<= 1;
-        data |= dht11_read_bit();
-    }
-    return data;
-}
-
-uint16_t dht11_read_data(uint8_t buffer[5])
-{
-    uint16_t i = 0;
-    
-    dht11_reset();
-    if (dht11_scan() == RESET)
-    {
-        //ºÏ≤‚µΩDHT11œÏ”¶
-        while (dht11_scan() == RESET);
-        while (dht11_scan() == SET);
-        for (i = 0; i < 5; i++)
-        {
-            buffer[i] = dht11_read_byte();
-        }
-        
-        while (dht11_scan() == RESET);
-        dht11_gpio_output();
-        DHT11_OUT_H;
-        
-        uint8_t checksum = buffer[0] + buffer[1] + buffer[2] + buffer[3];
-        if (checksum != buffer[4])
-        {
-            // checksum error
-            return 1;
-        }
-    }
-    
-    return 0;
-}
-#endif
