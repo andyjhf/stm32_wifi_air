@@ -56,17 +56,24 @@ int main(void)
 	USART1_Init();
 	LED_Init(LED1);
 	LED_Init(LED2);
-	LED_On(LED2);
 	SWI_Init(SW1_1);
 	if(!SWI_GetState(SW1_1))
+	{
+		LED_On(LED2);
 		g_SmartConfig = 1;
+	}
+	else
+	{
+		LED_On(LED1);
+	}
 	printf("system init\r\n");
 	USART3_Init();
-	IWDG_Init();
+	
 	hcho_adc_Init();
 	CXTaskHost_InitTask();
 	XTaskEsp8266_Init();
 	CXTaskComERV_InitTask();
+	IWDG_Init();
 //	osThreadDef(XTaskAirModule, Starttask, osPriorityAboveNormal, 0, 128);
 //  XTaskAHandle = osThreadCreate(osThread(XTaskAirModule), NULL);
 	osKernelStart();
