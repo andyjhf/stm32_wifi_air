@@ -1,6 +1,6 @@
 #include "dht11.h"
 
-void delay_us(uint32_t nTimer)
+static void delay_us(uint32_t nTimer)
 {
 	uint32_t i=0;
 	for(i=0;i<nTimer;i++){
@@ -12,7 +12,7 @@ void delay_us(uint32_t nTimer)
 	}
 }
 
-void delay_ms(uint32_t nTimer)
+static void delay_ms(uint32_t nTimer)
 {
 	uint32_t i=1000*nTimer;
 	delay_us(i);

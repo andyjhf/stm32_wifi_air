@@ -2,6 +2,8 @@
 #include "XApp.h"
 #include "hcho.h"
 #include "dht11.h"
+#include "sht30.h"
+#include "stdlib.h"
 static U16 m_tmBlink1   = 100;
 static U16 m_tmBlink2   = 2000;
 
@@ -18,7 +20,7 @@ static U8 m_airModuleState  = 0;
 static U16 m_sampleCnt = 0;
 static U16 m_tmSample = 10000;
 static U16 m_humi;
-static U16 m_temp;
+static int m_temp;
 
 osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
@@ -116,14 +118,14 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 	{
 		m_sampleCnt = 0;
 		taskDISABLE_INTERRUPTS();
-		result = Read_AM2302(&m_temp, &m_humi);
+		result = SHT30_Read_Humiture(&m_temp, &m_humi);
 		taskENABLE_INTERRUPTS();
 		if(result == SUCCESS)
 		{  
       g_Humidity = m_humi;  
-      g_Temperature = m_temp;
+      g_Temperature = (m_temp<0)?(abs(m_temp)|0x8000):m_temp;
 			if(m_temp & 0x8000)
-				printf("temp = -%d.%d \r\n",(m_temp&0x7F)/10,(m_temp&0x7F)%10);
+				printf("temp = -%d.%d \r\n",(m_temp&0x7FFF)/10,(m_temp&0x7FFF)%10);
 			else
 				printf("temp = %d.%d \r\n",m_temp/10,m_temp%10);
 			printf("humi = %d.%d \r\n",m_humi/10,m_humi%10);
@@ -141,7 +143,7 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 
 static void StartHostTask(void const * argument)
 {
-	AM2302_GPIO_Config();
+//	AM2302_GPIO_Config();
   for(;;)
   {
 		CXTaskHost_DoLoop(10);

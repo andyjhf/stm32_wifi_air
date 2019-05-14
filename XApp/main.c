@@ -41,6 +41,7 @@
 //#include "cmsis_os.h"
 #include "XApp.h"
 #include "hcho.h"
+#include "sht30.h"
 
 /**
   * @brief  The application entry point.
@@ -63,7 +64,8 @@ int main(void)
 	printf("system init\r\n");
 	USART3_Init();
 	IWDG_Init();
-	hcho_adc_Init();
+//	hcho_adc_Init();
+	SHT30_Init();
 	CXTaskHost_InitTask();
 	XTaskEsp8266_Init();
 	CXTaskComERV_InitTask();

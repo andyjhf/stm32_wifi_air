@@ -466,6 +466,16 @@
               <FileType>1</FileType>
               <FilePath>..\user_drivers\dht11.c</FilePath>
             </File>
+            <File>
+              <FileName>driver_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_drivers\driver_iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>SHT30.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_drivers\SHT30.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
