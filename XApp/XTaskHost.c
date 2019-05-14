@@ -16,20 +16,14 @@ static U8 m_smartLink = 0;
 static U8 m_airModuleState  = 0;                         
 
 static U16 m_sampleCnt = 0;
-static U16 m_tmSample = 5000;
+static U16 m_tmSample = 10000;
 static U16 m_humi;
 static U16 m_temp;
-static U16 m_humibuf[10];
-static U16 m_tempbuf[10];
-static U8 m_tempSampleCnt = 0;
 
 osThreadId HostTaskHandle;
 static void StartHostTask(void const * argument);
-U16 average(char type);
 void CXTaskHost_InitTask(void)
 {
-	U16 i;
-	U8 j,result;
 	m_tmBlink1   = 100;
 	m_tmBlink2   = 2000;
 
@@ -40,24 +34,6 @@ void CXTaskHost_InitTask(void)
 	m_wifiReady = 0;                               // 1: wifi module ready(started)
 	m_wifiLink  = 0;                               // 1: wifi module linked to ayla cloud
 	m_airModuleState  = 0;
-	
-	memset((U8*)m_humibuf,0,sizeof(m_humibuf));
-	memset((U8*)m_tempbuf,0,sizeof(m_tempbuf));
-	for(i=0;i<10000;i++)
-	{
-		taskDISABLE_INTERRUPTS();
-		result = Read_AM2302(&m_temp, &m_humi);
-		taskENABLE_INTERRUPTS();
-		if(result == SUCCESS)
-		{
-			for(j=0;j<sizeof(m_humibuf)/sizeof(U16);j++)
-			{
-				m_humibuf[j] = m_humi;  
-				m_tempbuf[j] = m_temp;
-			}
-			break;
-		}
-	}
 	
 	osThreadDef(HostTask, StartHostTask, osPriorityRealtime, 0, 128);
   HostTaskHandle = osThreadCreate(osThread(HostTask), NULL);
@@ -143,18 +119,14 @@ static void CXTaskHost_DoLoop(U16 tmOnce)
 		result = Read_AM2302(&m_temp, &m_humi);
 		taskENABLE_INTERRUPTS();
 		if(result == SUCCESS)
-		{
-			m_humibuf[m_tempSampleCnt++] = m_humi;
-			m_tempbuf[m_tempSampleCnt++] = m_temp;
-			if(m_tempSampleCnt == sizeof(m_tempbuf)/sizeof(U16))
-				m_tempSampleCnt = 0;
-			g_Humidity = average(1);  
-			g_Temperature = average(2);
-			if(g_Temperature & 0x8000)
-				printf("temp = -%d.%d \r\n",(g_Temperature&0x7F)/10,(g_Temperature&0x7F)%10);
+		{  
+      g_Humidity = m_humi;  
+      g_Temperature = m_temp;
+			if(m_temp & 0x8000)
+				printf("temp = -%d.%d \r\n",(m_temp&0x7F)/10,(m_temp&0x7F)%10);
 			else
-				printf("temp = %d.%d \r\n",g_Temperature/10,g_Temperature%10);
-			printf("humi = %d.%d \r\n",g_Humidity/10,g_Humidity%10);
+				printf("temp = %d.%d \r\n",m_temp/10,m_temp%10);
+			printf("humi = %d.%d \r\n",m_humi/10,m_humi%10);
 		}
 	}
 
@@ -176,37 +148,6 @@ static void StartHostTask(void const * argument)
 		osDelay(10);
   }
 
-}
-
-U16 average(char type)
-{
-	U16 i;
-	S32 sum = 0;
-	S16 temp;
-	U8 flag = 0;
-	for(i=0;i<sizeof(m_tempbuf)/sizeof(U16);i++)
-	{
-		if(type == 1)
-			sum += m_humibuf[i];
-		else
-		{
-			if(m_tempbuf[i] & 0x8000)
-			{
-				sum -= (m_tempbuf[i] & 0x7fff);
-			}
-			else
-			{
-				sum += m_tempbuf[i];
-			}
-		}
-	}
-	temp = sum/(sizeof(m_tempbuf)/sizeof(U16));
-	if(temp < 0)
-	{
-		temp = (~temp)+1;
-		temp = temp | 0x8000;
-	}
-	return temp;
 }
 
 //static void CXTaskHost_sampling(void)
